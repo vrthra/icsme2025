@@ -20,7 +20,7 @@
 \usepackage{multirow}
 \usepackage{pifont}% http://ctan.org/pkg/pifont
 \usepackage{hyperref}
-\newcommand{\mytitle}{Making Credible Reachability Assessments in Fuzzing}
+\newcommand{\mytitle}{Assessing Reliability of Statistical Maximum Coverage Estimators in Fuzzing}
 \hypersetup{pdftitle={\mytitle},
 colorlinks=true,linkcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue
 }
@@ -130,9 +130,32 @@ rahul.gopinath@sydney.edu.au}
 
 
 \begin{abstract}
-Reachability of program elements is a fundamental challenge in software testing, as achieving 100\% coverage is practically impossible, regardless of the duration of testing. With the increasing adoption of fuzzing as an automated software testing technique, quantitatively assessing reachability has become a key research problem. Statistical estimation has been proposed as a promising approach by modeling fuzzing as a statistical sampling process. However, evaluating these methods remains difficult due to the lack of a concrete ground truth. Recent techniques, such as fuzzing small-scale programs to saturation of coverage or resampling from previously generated inputs until an asymptote is reached, have notable limitations and do not provide definitive ground truths for comparison.
+Fuzzers are often guided by coverage, making the estimation of maximum possible
+coverage a key concern in fuzzing.
+However, achieving 100\% coverage is impossible for most real-world software
+systems, regardless of the time spent fuzzing.
+While static analysis of reachability can provide an upper bound, it is often
+highly inaccurate.
 
-Applying \emph{species richness estimators} from ecological bio-statistics to fuzzing by considering it as a statistical sampling process, we argue that estimates of reachable coverage should remain consistent regardless of the sampling unit used. In this context, we define sampling units as temporally segregated collections of test inputs, whose size can be adjusted by varying the interval in a fuzzing campaign. This approach was recently explored in mutation analysis, where it faced challenges in accurately detecting killable mutants. However, this does not imply that species richness estimates are unsuitable for reachability estimation in fuzzing. While overlapping confidence bounds in these estimates indicate consistency and precision when altering the sampling unit, they do not necessarily reflect the accuracy of reachability estimation. To address this, we empirically evaluate previously proposed stopping criteria to determine when each estimate serves as an upper bound for reachable coverage.
+Recently, statistical estimation techniques inspired by the use of species
+richness estimators in biostatistics, where estimating remaining coverage is
+analogous to estimating unseen species,
+have been proposed as a potential solution.
+However, a lack of reliable benchmarks with labeled ground truth has limited a
+thorough evaluation of the accuracy of this approach.
+Unfortunately, producing large-scale benchmarks with labeled ground truth is
+practically infeasible.
+
+To address this challenge, we propose an alternative evaluation criterion for
+species richness based estimators.
+We argue that, when using species richness estimators, the estimated reachable coverage should remain consistent regardless of the sampling unit used.
+
+To resolve this issue, in this paper, we propose an alternative evaluation criteria
+We argue that, when using species richness estimators, estimates of reachable
+coverage should remain consistent regardless of the sampling unit used.
+
+We propose to empirically evaluate the species estimation criteria under various
+sampling units.
 
 \end{abstract}
 
