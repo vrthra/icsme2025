@@ -1,0 +1,49 @@
+\section{Preliminaries} \label{sec:model}
+
+\subsection{Probabilistic Model for Fuzzing} 
+
+The recently proposed STADS framework, inspired by ecological bio-statistics models, formalizes fuzzing as a statistical sampling process. We adopt this statistical perspective from STADS \cite{stads,residual2021,bedivfuzz,entropic}, where fuzzing is modeled as a sampling process $\mathcal{F}$, in which test inputs are drawn with replacement from the program input space $\pmb{\mathcal{D}}$. Formally, $\mathcal{F}$ is defined as a sequence of $N$ independent and identically distributed (i.i.d.) random variables:
+
+\begin{equation*}
+    \mathcal{F}=\{X_n \mid X_n \in \pmb{\mathcal{D}}\}_{n=1}^N
+\end{equation*}
+
+We partition the input space $\pmb{\mathcal{D}}$ into $S$ overlapping subdomains $\{\mathcal{D}_i\}_{i=1}^S$, where each subdomain corresponds to a \emph{coverage element}. An input $X_n \in \mathcal{F}$ is said to cover a \emph{new} coverage element $\mathcal{D}_i$ if $X_n \in \mathcal{D}_i$ and no previously sampled input $X_m \in \mathcal{F}$ (for $m < n$) belongs to $\mathcal{D}_i$, meaning $\mathcal{D}_i$ is sampled for the first time.
+
+\subsection{Bernoulli Product Model}
+
+Since each input in fuzzing can cover \emph{one or more coverage elements}, we record coverage information as \emph{sampling unit-based incidence data} \cite{colwell2012models,Chao_etal:2017} and model it using the Bernoulli Product model. This approach is more practical, as it eliminates the need to record data for every individual test input in a fuzzing process that generates thousands of inputs per second. Instead, multiple inputs can be grouped into a \emph{sampling unit}.
+
+For each sampling unit, the fuzzing data indicate whether a coverage element has been reached. Let $\pi_i$ denote the probability that a sampling unit covers element $\mathcal{D}_i$, assuming $\pi_i$ remains constant across all randomly selected sampling units. In general, the sum of all $\pi_i$ values does \emph{not} equal unity.
+
+During a fuzzing campaign, suppose we record $t$ sampling units. The incidence data form an element-by-sampling-unit incidence matrix ${W_{ij};i=1,2,\dots,S,j=1,2,\dots,t}$ with $S$ rows and $t$ columns, where $W_{ij} = 1$ if element $i$ is covered in sampling unit $j$, and $W_{ij} = 0$ otherwise.
+
+The incidence frequency $Y_i$ represents the number of sampling units in which element $\mathcal{D}_i$ is covered; i.e., $Y_i=\sum_{j=1}^{t}W_{ij}$. A coverage element $\mathcal{D}_i$ that has not been covered by any sampling unit will have an incidence frequency of zero; i.e., $Y_i=0$.
+
+Given the set of detection probabilities $(\pi_1,\pi_2,\dots,\pi_S)$, we assume each element $W_{ij}$ in the incidence matrix follows a Bernoulli distribution with probability $\pi_i$. The probability distribution for the incidence matrix is:
+
+\begin{equation}
+    \begin{split}
+        P(W_{ij}=w_{ij};i=1,2,\dots,S,j=1,2,\dots,t) \\
+        = \prod_{j=1}^{t}\prod_{i=1}^{S}\pi_i^{w_{ij}}(1-\pi_i)^{1-w_{ij}} \\
+        = \prod_{i=1}^{S}\pi_i^{y_i}(1-\pi_i)^{t-y_i}.
+    \end{split}
+\end{equation}
+
+The marginal distribution for the incidence-based frequency $Y_i$ for the $i$-th coverage element follows a binomial distribution characterized by $t$ and the detection probability $\pi_i$:
+
+\begin{equation}
+    P(Y_i=y_i) = \binom{t}{y_i}\pi_i^{y_i}(1-\pi_i)^{t-y_i}, \qquad i=1,2,\dots,S.
+\end{equation}
+
+Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ is the number of elements covered in exactly $k$ sampling units in the data, $k=0,1,\dots,t$. Here, $f_1$ represents the number of ``singleton" elements (those that are covered in only one sampling unit), and $f_2$ represents the number of ``doubleton" elements (those that are covered in exactly two sampling units). The unobservable zero frequency count $f_0$ denotes the number of coverage elements that are not covered by any of the $t$ sampling units. Then, the number of covered elements in the current campaign is $S(t)=\sum_{i>0}f_i$, and $S(t)+f_0=S$.
+
+
+%During a fuzzing campaign where we generate enormous amount of test inputs per unit time (at least thousands of inputs within seconds), it is not quite not practical to save the outcome for each input (i.e. the species $\mathcal{D}_i$ that our $X_n$ belongs to) in our data storage. Yet, it is a common practice to write such data at regular intervals. For instance, in our experimentation of 7-day fuzzing campaigns, we record incidence data once in every 15 minutes. Statistically, we can consider all the inputs generated between two consecutive recording instances as a sample of inputs and we indicate the detection/non-detection of species in this sample as a record. 
+%
+
+%Below we explain the probabilistic model for our fuzzing data. 
+%
+%\subsection{Probabilistic Model for Sampling-Unit-Based Data} \label{sec:probmodel}
+%
+%Assuming that the fuzzer's search space contains $S$ species, indexed by ${1,2,\dots,S}$. Without loss of generality, assume we have sampled $t$ sampling units, indexed by $1,2,\dots,t$, where each sampling unit represents a set of test inputs generated during a certain period of the ongoing fuzzing campaign. A species could be any choice of a program behaviour such as bugs or coverage elements like program paths, branches, or functions. It is assumed that these sampling units are randomly and independently sampled.

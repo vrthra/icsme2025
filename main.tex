@@ -1,0 +1,161 @@
+% https://conf.researchr.org/track/icsme-2025/icsme-2025-registered-reports
+% Submissions to the ICSME 2025 RR track must not exceed 6 pages (plus 1 additional page of references). The page limit is strict. All submissions must be in PDF and must be submitted online by the deadline via the ICSME 2025 EasyChair link.
+
+
+% 20th May last date.
+\documentclass[conference]{IEEEtran}
+
+\IEEEoverridecommandlockouts
+
+
+%\usepackage{csquotes}
+%\usepackage{cite}
+\usepackage{amsmath,amsfonts,amsthm}
+\usepackage{algorithm,algorithmic}
+\usepackage{xspace}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\usepackage{hyperref}
+\newcommand{\mytitle}{Making Credible Reachability Assessments in Fuzzing}
+\hypersetup{pdftitle={\mytitle},
+colorlinks=true,linkcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue
+}
+
+\usepackage{subfig,paralist}
+\usepackage{pifont}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow,array}
+\usepackage{threeparttable}
+%\usepackage{balance}
+%\usepackage[group-separator={,}]{siunitx}
+%\usepackage[capitalise]{cleveref}
+\usepackage{bm}
+
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+\urlstyle{tt}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{lemma}{Lemma}
+%\renewcommand\qedsymbol{$\blacksquare$}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+
+\usepackage{tcolorbox}% http://ctan.org/pkg/tcolorbox
+\definecolor{mycolor}{rgb}{0.122, 0.435, 0.698}% Rule colour
+\definecolor{gray1}{gray}{0.3}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{mystyle}{
+    %backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\tiny\ttfamily,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    columns=fixed
+}
+\lstset{style=mystyle}
+
+\newcommand{\result}[1]{%
+\begin{tcolorbox}[colframe=black,boxrule=0.5pt,arc=4pt,
+      left=6pt,right=6pt,top=6pt,bottom=6pt,boxsep=0pt,width=\columnwidth]%
+      {\emph{#1}}
+\end{tcolorbox}%
+}
+
+\definecolor{darkgreen}{rgb}{0.0, 0.5, 0.0}
+\definecolor{darkred}{rgb}{0.82, 0.1, 0.26}
+\newcommand{\cmark}{\textcolor{darkgreen}{\ding{51}}}%
+\newcommand{\xmark}{\textcolor{darkred}{\ding{55}}\ }%
+
+\newcommand{\todo}[1]{\noindent\textcolor{red}{TODO:\xspace #1}}
+\newcommand{\chk}[1]{\noindent\textcolor{red}{#1\xspace}}
+
+% Section labels
+\def\sectionautorefname{Section}
+\def\subsectionautorefname{Section}
+\def\subsubsectionautorefname{Section}%%
+
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+
+\begin{document}
+
+\title{\mytitle}
+
+\author{
+\IEEEauthorblockN{Danushka Liyanage}
+\IEEEauthorblockA{\textit{School of Computer Science} \\
+\textit{University of Sydney}\\
+Sydney, Australia \\
+danushka.liyanage@sydney.edu.au}
+\and 
+\IEEEauthorblockN{Rahul Gopinath}
+\IEEEauthorblockA{\textit{School of Computer Science} \\
+\textit{University of Sydney}\\
+Sydney, Australia \\
+rahul.gopinath@sydney.edu.au}
+}
+
+\maketitle
+
+\thispagestyle{plain}
+\pagestyle{plain} 
+
+
+\begin{abstract}
+Reachability of program elements is a fundamental challenge in software testing, as achieving 100\% coverage is practically impossible, regardless of the duration of testing. With the increasing adoption of fuzzing as an automated software testing technique, quantitatively assessing reachability has become a key research problem. Statistical estimation has been proposed as a promising approach by modeling fuzzing as a statistical sampling process. However, evaluating these methods remains difficult due to the lack of a concrete ground truth. Recent techniques, such as fuzzing small-scale programs to saturation of coverage or resampling from previously generated inputs until an asymptote is reached, have notable limitations and do not provide definitive ground truths for comparison.
+
+Applying \emph{species richness estimators} from ecological bio-statistics to fuzzing by considering it as a statistical sampling process, we argue that estimates of reachable coverage should remain consistent regardless of the sampling unit used. In this context, we define sampling units as temporally segregated collections of test inputs, whose size can be adjusted by varying the interval in a fuzzing campaign. This approach was recently explored in mutation analysis, where it faced challenges in accurately detecting killable mutants. However, this does not imply that species richness estimates are unsuitable for reachability estimation in fuzzing. While overlapping confidence bounds in these estimates indicate consistency and precision when altering the sampling unit, they do not necessarily reflect the accuracy of reachability estimation. To address this, we empirically evaluate previously proposed stopping criteria to determine when each estimate serves as an upper bound for reachable coverage.
+
+\end{abstract}
+
+\input{intro.tex}
+\input{model.tex}
+\input{estimation.tex}
+\input{methodology.tex}
+\input{setup.tex}
+\input{related.tex}
+
+%\section{Authors and Affiliations}
+
+
+\bibliographystyle{IEEEtranS}
+\bibliography{references.bib}
+
+
+%\section{Acknowledgments}
+
+%% If your work has an appendix, this is the place to put it.
+%\appendix
+
+\end{document}
+\endinput
+%%
+%% End of file `sample-manuscript.tex'.
