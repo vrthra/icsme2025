@@ -161,8 +161,20 @@ coverage in real-world fuzzing campaigns.
 
 
 \section{Introduction}
+Fuzzing is an automated testing technique that leverages guidance provided
+by coverage. The budget allocated to fuzzing, and hence, the stopping criteria
+of fuzzing is strongly determined by the maximum possible coverage that can
+be obtained~\cite{fell2017review}.
 
-Achieving 100\% coverage in software testing remains seemingly impossible goal for most real-world programs, except for the most trivial cases \cite{horgan1994achieving}. As software systems increase in complexity, their input and execution spaces expand dramatically, rendering exhaustive testing generally infeasible \cite{knight1996exhaustive}. Even \emph{fuzzing}—despite its strength as an automated testing technique capable of generating large volumes of inputs—is inherently bounded in its \emph{maximum reachability}, falling short of exercising all possible coverage elements in the target program \cite{fell2017review}. Yet, quantifying this maximum reachability remains a challenge, which raises a fundamental question: \emph{How close is a fuzzing campaign to achieving its maximum reachable coverage?}
+However, achieving 100\% coverage in software testing is an impossible goal for
+complex real-world programs~\cite{horgan1994achieving}.
+This is due to the increase in input domain and the corresponding
+increase in execution spaces, which makes exhaustive testing
+impossible~\cite{knight1996exhaustive}.
+
+Yet, quantifying the maximum possible coverage (also called \emph{maximum reachability})
+remains a challenge, which raises a fundamental question:
+\emph{How close is a fuzzing campaign to achieving its maximum reachable coverage?}
 
 Recent researches have proposed statistical estimators as a pertinent candidate—particularly \emph{species richness estimators} from ecological biostatistics—as a principled approach to estimate the reachable coverage of a fuzzing campaign \cite{reachability_2023,stads}. These estimators treat fuzzing as a statistical sampling process in which each test input belongs to one or more program behaviors (e.g., a branch, path, function, or bug). Estimating the number of \emph{unseen} behaviors thus parallels the ecological problem of estimating unobserved species in a population \cite{chao2016species}. Under this analogy, statistical estimators such as Chao2 \cite{chao2017thirty} have been explored to approximate total reachable coverage from partially observed data.
 
