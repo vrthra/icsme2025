@@ -579,11 +579,40 @@ as context-sensitivity.
 
 \noindent\textbf{Scalability and Applicability:} This methodology is designed to generate large-scale C parsers that consist of thousands of lines of code and complex control-flow.
 
-\subsection{Assessing Reliability of the Estimators of Stopping Criterion}
+\subsection{Assessing Reliability \texorpdfstring{$\hat{S}$}{S-hat} Estimators Without Ground truth}
+To overcome any limitation that may exist due to the synthetic nature of our
+previously proposed benchmark, we propose a second criterion that can be applied
+to real-world benchmarks without relying on availability of ground truth.
+
+Our approach is inspired by the previous research on equivalent mutant
+estimation~\cite{kuznetsov2024empirical}, which suggests that varying
+sample-units can be leveraged to evaluate the reliability of estimators.
+The idea is that, while incidence-based statistical estimators of
+fuzzing effectiveness may be sensitive to the sampling unit size ($r$),
+a reliable estimator should produce overlapping point estimates for $S$—with
+varying variance but consistent expectation when evaluated over equal-length
+campaigns.
+
+We propose to evaluate whether estimators of maximum reachability $S$ yield
+consistent point estimates with overlapping confidence intervals, while allowing
+for differences in estimation accuracy (i.e., variability) across fuzzing
+campaigns with different sampling unit definitions $r$.
 
 
 % TODO: This should be in the previous section. Not here.
-% Prior empirical research on estimating maximum reachable coverage in fuzzing campaigns—under the Bernoulli product model—has shown that statistical estimators systematically underestimate true reachability until near saturation, a phenomenon termed \emph{false peaks} by \cite{reachability_2023}. This negative bias is largely inevitable in early stages due to the insufficiency of fuzzing data and the heterogeneous species diversity, which limits accurate approximation of the species distribution. These limitations prompt a critical question: \emph{How can we ensure that statistical estimators provide reliable approximations of maximum reachability $S$ in fuzzing campaigns?}
+% Prior empirical research on estimating maximum reachable coverage in fuzzing
+% campaigns—under the Bernoulli product model—has shown that statistical
+% estimators systematically underestimate true reachability until near
+% saturation, a phenomenon termed \emph{false peaks}~\cite{reachability_2023}.
+% This negative bias is largely inevitable in early stages due to the
+% insufficiency of fuzzing data and the heterogeneous species diversity,
+% which limits accurate approximation of the species distribution.
+% 
+% Prior research~\cite{reachability_2023} empirically investigated this
+% phenomenon, and suggests that estimators become reliable when the
+% count of doubletons equals or exheeds singletons.
+
+%  These limitations prompt a critical question: \emph{How can we ensure that statistical estimators provide reliable approximations of maximum reachability $S$ in fuzzing campaigns?}
 % 
 % \result{\textbf{Intuition:} While incidence-based statistical estimators of fuzzing effectiveness are sensitive to the sampling unit size ($r$), a reliable estimator should produce overlapping point estimates for $S$—with varying variance but consistent expectation—when evaluated over equal-length campaigns.}
 % 
@@ -591,10 +620,11 @@ as context-sensitivity.
 % 
 % However, since the maximum reachability $S$ is a finite quantity for any given fuzzing campaign, a reliable estimator should approximate it within reasonable error bounds—despite variability in incidence frequencies introduced by changes in the sampling unit definition—provided that the estimation is performed at the same time point since the campaign's start. Leveraging this property, we evaluate whether estimators of maximum reachability $S$ yield consistent point estimates with overlapping confidence intervals, while allowing for differences in estimation accuracy (i.e., variability) across fuzzing campaigns with different sampling unit definitions $r$.
 
-\textcolor{red}{Stopping Criterion Evaluation:
-Evaluate the stopping criterion in checking the reliability of reachability estimators. (Applicable beyond f1 <f2) By evaluating f1 actually becomes an upper bound to f0.
-}
+% \textcolor{red}{Stopping Criterion Evaluation:
+% Evaluate the stopping criterion in checking the reliability of reachability estimators. (Applicable beyond f1 <f2) By evaluating f1 actually becomes an upper bound to f0.
+%}
 % --- End Methodology
+
 
 \section{Experimental Setup} \label{sec:setup}
 
