@@ -130,33 +130,9 @@ rahul.gopinath@sydney.edu.au}
 
 
 \begin{abstract}
-Fuzzers are often guided by coverage, making the estimation of maximum possible
-coverage a key concern in fuzzing.
-However, achieving 100\% coverage is impossible for most real-world software
-systems, regardless of the time spent fuzzing.
-While static analysis of reachability can provide an upper bound, it is often
-highly inaccurate.
+Fuzzers are often guided by coverage, making the estimation of maximum possible coverage a key concern in fuzzing. However, achieving 100\% coverage is impossible for most real-world software systems, regardless of the time spent fuzzing. While static analysis of reachability can provide an upper bound, it is often highly inaccurate. Recently, statistical estimation techniques inspired by species richness estimators in biostatistics, where estimating remaining coverage is analogous to estimating unseen species, have been proposed as a potential solution. However, a lack of reliable benchmarks with labeled ground truth has limited a thorough evaluation of the accuracy of this approach.
 
-Recently, statistical estimation techniques inspired by the use of species
-richness estimators in biostatistics, where estimating remaining coverage is
-analogous to estimating unseen species,
-have been proposed as a potential solution.
-However, a lack of reliable benchmarks with labeled ground truth has limited a
-thorough evaluation of the accuracy of this approach.
-Unfortunately, producing large-scale benchmarks with labeled ground truth is
-practically infeasible.
-
-To address this challenge, we propose an alternative evaluation criterion for
-species richness based estimators.
-We argue that, when using species richness estimators, the estimated reachable coverage should remain consistent regardless of the sampling unit used.
-
-To resolve this issue, in this paper, we propose an alternative evaluation criteria
-We argue that, when using species richness estimators, estimates of reachable
-coverage should remain consistent regardless of the sampling unit used.
-
-We propose to empirically evaluate the species estimation criteria under various
-sampling units.
-
+To address this challenge, we propose a novel evaluation framework that leverages the isomorphism between program control flow and context-free grammars. By generating context-free grammars and converting them into parsers that emulate the control flow of real-world programs, we create synthetic benchmarks where 100\% reachability is assured, providing the necessary ground truth for evaluation. Using these benchmarks, we empirically evaluate various species richness estimators under different sampling units. We argue that reliable estimators should produce consistent results regardless of the sampling unit used. Through this evaluation, we aim to identify which estimators demonstrate the highest accuracy against known ground truth and consistency across sampling units, potentially providing more reliable approaches to estimating maximum possible coverage in real-world fuzzing campaigns.
 \end{abstract}
 
 
