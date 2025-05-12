@@ -281,12 +281,14 @@ fault localization techniques, program repair techniques, and so on.
  \node[start] (b1)    {s};
  \node[box] (b2)    {A};
  \node[box] (b3)    {B};
- \node[stop] (b4)    {e};
+ \node[box] (b4)    {C};
+ \node[stop] (b5)    {e};
  \begin{scope}[rounded corners,-latex]
   \path
   (b1) edge (b2)
   (b2) edge (b3)
-  (b3) edge (b4);
+  (b3) edge (b4)
+  (b4) edge (b5);
  \end{scope}
 \end{tikzpicture}         
 \caption{Sequence}
