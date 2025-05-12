@@ -433,9 +433,11 @@ precisely tuned based on the following parameters
 (5) The length of individual rules
 (6) The VC dimension of the language.
 
+This allows us to generate large scale parser programs at will with complex control-flows. We can
+additionally increase the difficulty level by adding extra constraints to the generated parser such
+as context-sensitivity.
 
-
-\noindent\textbf{Scalability and Applicability:} This methodology is designed to be applicable to large-scale C programs that consist of thousands of lines of code and complex control-flow. By ensuring syntactic correctness and guiding input generation using precise control-flow instrumentation, our approach enables deep semantic exploration of the PUT without exhaustive enumeration or symbolic execution. Furthermore, it is compatible with modern fuzzing frameworks such as \texttt{AFL++}, \texttt{Superion}, and \texttt{Angora}, making it a practical foundation for evaluating reachability estimation techniques.
+\noindent\textbf{Scalability and Applicability:} This methodology is designed to generate large-scale C parsers that consist of thousands of lines of code and complex control-flow.
 
 \subsection{Assessing Reliability of the Estimators of \texorpdfstring{$\hat{S}$}{S-hat}}
 
