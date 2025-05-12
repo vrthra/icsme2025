@@ -25,6 +25,7 @@
 colorlinks=true,linkcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue
 }
 \usepackage{cleveref}
+\usepackage{subcaption}
 
 \usepackage{subfig,paralist}
 \usepackage{pifont}
@@ -38,6 +39,18 @@ colorlinks=true,linkcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue
 %\usepackage[group-separator={,}]{siunitx}
 %\usepackage[capitalise]{cleveref}
 \usepackage{bm}
+\usepackage{syntax}
+
+\usepackage{bbding}
+\DeclareUnicodeCharacter{1F3B2}{\dice}
+
+\usepackage{wrapfig}
+\usepackage{tikz}
+\usetikzlibrary{shapes, calc, decorations, automata}
+\usetikzlibrary{shapes.geometric, arrows}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{chains,shadows.blur}
 
 
 \newcounter{todocounter}
@@ -252,11 +265,135 @@ evaluating the reliability of estimators, but also for other evaluation
 tasks that require complex programs such as evaluating fuzzers,
 fault localization techniques, program repair techniques, and so on.
 
-\begin{figure*}
-  \includegraphics[width=\textwidth]{basiccfg.pdf}
-  \caption{Control flow to context-free grammar}
-  \label{fig:cfg}
-\end{figure*}
+\begin{figure}
+%    \vspace{-2cm}
+\begin{subfigure}[h]{0.3\textwidth}
+\centering
+\begin{tikzpicture}[auto,
+  node distance = 3mm,
+  start chain = going below,
+  start/.style = {ellipse,draw,text width= 1em,rounded corners,blur shadow,fill=white,
+        on chain,align=center},
+  box/.style = {draw,rounded corners,blur shadow,fill=white,
+        on chain,align=center},
+  stop/.style = {circle,minimum width=20pt,draw,blur shadow,fill=white,
+        on chain,align=center}]
+ \node[start] (b1)    {s};
+ \node[box] (b2)    {A};
+ \node[box] (b3)    {B};
+ \node[stop] (b4)    {e};
+ \begin{scope}[rounded corners,-latex]
+  \path
+  (b1) edge (b2)
+  (b2) edge (b3)
+  (b3) edge (b4);
+ \end{scope}
+\end{tikzpicture}         
+\caption{Sequence}
+\label{tikz:sequence}
+\end{subfigure}
+\begin{subfigure}[h]{0.3\textwidth}
+\centering
+% \vspace{2.8cm}
+\begin{tikzpicture}[auto,
+  node distance = 3mm,
+  start chain = going below,
+  start/.style = {ellipse,draw,text width= 1em,rounded corners,blur shadow,fill=white,
+        on chain,align=center},
+  box/.style = {draw,rounded corners,blur shadow,fill=white,
+        on chain,align=center},
+  cond/.style = {diamond,draw,rounded corners,blur shadow,fill=white,
+        on chain,align=center},
+  stop/.style = {circle,minimum width=20pt,draw,blur shadow,fill=white,
+        on chain,align=center}
+]
+ \node[start] (b1)    {s};
+ \node[cond] (b2)    {C};
+ \node[box, left=1cm of b2] (b21) {A};
+ \node[box,right=1cm of b2] (b22)    {B};
+ \node[stop,below=5mm of b2] (b3)    {e};
+ \begin{scope}[rounded corners,-latex]
+ \path
+ (b1) edge (b2);
+ \path
+ (b2) edge node [midway,above] {T} (b21);
+ \path
+ (b2) edge node [midway,above] {F} (b22)
+ (b21) edge (b3)
+ (b22) edge (b3);
+\end{scope}
+\end{tikzpicture}
+\caption{Condition}
+\label{tikz:condition}
+\end{subfigure}
+\begin{subfigure}[h]{0.3\textwidth}
+\centering
+% \vspace{2.8cm}
+\begin{tikzpicture}[auto,
+  node distance = 3mm,
+  start chain = going below,
+  start/.style = {ellipse,draw,text width= 1em,rounded corners,blur shadow,fill=white,
+  on chain,align=center},
+  box/.style = {draw,rounded corners,blur shadow,fill=white,
+  on chain,align=center},
+  cond/.style = {diamond,aspect=1,draw,rounded corners,blur shadow,fill=white,
+  on chain,align=center},
+  stop/.style = {circle,minimum width=20pt,draw,blur shadow,fill=white,
+  on chain,align=center}]
+ \node[start] (b1)    {s};      
+ \node[cond] (b2)    {C};      
+ \node[box] (b3)    {B};  
+ \node[stop] (b4)    {e};
+ \begin{scope}[rounded corners,-latex]
+  \path (b2.-40) edge[bend left=50] (b4.40)
+  (b1) edge (b2)
+  (b2) edge (b3);
+  \draw (b3.200) -- ++(0,0) -| ([xshift=-5mm]b2.west) |-
+  ([yshift=3mm]b2.130) -- (b2.130);
+  %\path (b3.230) edge[bend left=90] (b2);
+ \end{scope}
+\end{tikzpicture}
+\caption{Iteration}
+\label{tikz:iteration}
+\end{subfigure}
+
+\begin{subfigure}[h]{0.3\textwidth}
+\begin{grammar}\centering
+  <s> $\rightarrow$ <A> <B> <C>
+\end{grammar}
+\end{subfigure}
+\begin{subfigure}[h]{0.3\textwidth}
+\begin{grammar}\centering
+    <s> $\rightarrow$ <C> <IF> \phantom{a}
+    
+    <IF> $\rightarrow$ `T' <A> | `F' <B>
+\end{grammar}
+%\begin{grammar}\centering
+%  <s> $\rightarrow$ <C> <IF>
+ % 
+ % <IF> $\rightarrow$ <A>
+ % \alt <B>
+%\end{grammar}
+\end{subfigure}
+\begin{subfigure}[h]{0.3\textwidth}
+\begin{grammar}\centering
+  <s> $\rightarrow$ <L>\phantom{d a b c d}
+  
+  <L> $\rightarrow$ <C> <If> <L> | $\epsilon$
+  %<L> $\rightarrow$ $\epsilon$\phantom{d a b c d f g}
+  
+\end{grammar}
+
+\end{subfigure}
+
+\caption{The basic control-flow structures}
+\label{fig:controlflow}
+\end{figure}
+%\begin{figure*}
+%  \includegraphics[width=\textwidth]{basiccfg.pdf}
+%  \caption{Control flow to context-free grammar}
+%  \label{fig:cfg}
+%\end{figure*}
 
 While synthetic benchmarks are a useful alternative, is it possible to use
 real-world programs even if ground-truth (the maximum reachability) is not
