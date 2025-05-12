@@ -130,9 +130,33 @@ rahul.gopinath@sydney.edu.au}
 
 
 \begin{abstract}
-Fuzzers are often guided by coverage, making the estimation of maximum possible coverage a key concern in fuzzing. However, achieving 100\% coverage is impossible for most real-world software systems, regardless of the time spent fuzzing. While static analysis of reachability can provide an upper bound, it is often highly inaccurate. Recently, statistical estimation techniques inspired by species richness estimators in biostatistics, where estimating remaining coverage is analogous to estimating unseen species, have been proposed as a potential solution. However, a lack of reliable benchmarks with labeled ground truth has limited a thorough evaluation of the accuracy of this approach.
+Fuzzers are often guided by coverage, making the estimation of maximum
+possible coverage a key concern in fuzzing.
+However, achieving 100\% coverage is impossible for most real-world
+software systems, regardless of the time spent fuzzing.
+While static analysis of reachability can provide an upper bound,
+it is often highly inaccurate.
+Recently, statistical estimation based on species richness estimators
+in biostatistics have been proposed as a potential solution.
+However, a lack of reliable benchmarks with labeled ground truth has
+limited a thorough evaluation of the accuracy of this approach.
 
-To address this challenge, we propose a novel evaluation framework that leverages the isomorphism between program control flow and context-free grammars. By generating context-free grammars and converting them into parsers that emulate the control flow of real-world programs, we create synthetic benchmarks where 100\% reachability is assured, providing the necessary ground truth for evaluation. Using these benchmarks, we empirically evaluate various species richness estimators under different sampling units. We argue that reliable estimators should produce consistent results regardless of the sampling unit used. Through this evaluation, we aim to identify which estimators demonstrate the highest accuracy against known ground truth and consistency across sampling units, potentially providing more reliable approaches to estimating maximum possible coverage in real-world fuzzing campaigns.
+To address this challenge, we propose a novel evaluation framework
+that leverages the isomorphism between program control flow and context-free grammars.
+By generating context-free grammars and converting them into parsers that
+emulate the control flow of real-world programs,
+we create synthetic benchmarks where 100\% reachability is assured,
+providing the necessary ground truth for evaluation.
+Secondly, we propose a novel check for the reliability of estimators---by
+varying the size of sampling units which, under theory should not impact
+the estimation.
+
+Using these benchmarks, we empirically evaluate various species richness
+estimators under different sampling units. Thorugh this evaluation, we aim to
+identify which estimators demonstrate the highest accuracy against known
+ground truth and consistency across sampling units,
+potentially providing more reliable approaches to estimating maximum possible
+coverage in real-world fuzzing campaigns.
 \end{abstract}
 
 
