@@ -314,17 +314,24 @@ Formally, $\mathcal{F}$ is defined as a sequence of $N$ independent and identica
     \mathcal{F}=\{X_n \mid X_n \in \pmb{\mathcal{D}}\}_{n=1}^N
 \end{equation*}
 
-We partition the input space $\pmb{\mathcal{D}}$ into $S$ overlapping subdomains
-\todo{It is not clear why an input subdomain should correspond exactly to a specific coverage element}
+The STADS framework partitions the input space $\pmb{\mathcal{D}}$ into $S$ overlapping subdomains
 $\{\mathcal{D}_i\}_{i=1}^S$, where each subdomain corresponds to a \emph{coverage element}. An input $X_n \in \mathcal{F}$ is said to cover a \emph{new} coverage element $\mathcal{D}_i$ if $X_n \in \mathcal{D}_i$ and no previously sampled input $X_m \in \mathcal{F}$ (for $m < n$) belongs to $\mathcal{D}_i$, meaning $\mathcal{D}_i$ is sampled for the first time.
 
 \subsection{Bernoulli Product Model}
+Since each input in fuzzing can cover \emph{one or more coverage elements},
+STADS records coverage information as \emph{sampling unit-based incidence data}~\cite{colwell2012models,Chao_etal:2017}, where a sampling-unit is an aggregation of inputs during a fixed interval of time.
+This is then modeled using the Bernoulli Product model.
+This approach of grouping data into sampling-units is necessary to avoid having
+to record detailed records for each input during fuzzing.
+%This approach eliminates the need to record data for every individual test input in a fuzzing process that generates thousands of inputs per second. Instead, multiple inputs can be grouped into a \emph{sampling unit}.
 
-Since each input in fuzzing can cover \emph{one or more coverage elements}, we record coverage information as \emph{sampling unit-based incidence data} \cite{colwell2012models,Chao_etal:2017} and model it using the Bernoulli Product model. This approach is more practical, as it eliminates the need to record data for every individual test input in a fuzzing process that generates thousands of inputs per second. Instead, multiple inputs can be grouped into a \emph{sampling unit}.
+For each sampling unit, the collected data indicates whether a coverage element
+has been reached. Let $\pi_i$ denote the probability that a sampling unit covers
+element $\mathcal{D}_i$, assuming $\pi_i$ remains constant across all randomly
+selected sampling units.
+In general, the sum of all $\pi_i$ values does \emph{not} equal unity.
 
-For each sampling unit, the fuzzing data indicate whether a coverage element has been reached. Let $\pi_i$ denote the probability that a sampling unit covers element $\mathcal{D}_i$, assuming $\pi_i$ remains constant across all randomly selected sampling units. In general, the sum of all $\pi_i$ values does \emph{not} equal unity.
-
-During a fuzzing campaign, suppose we record $t$ sampling units. The incidence data form an element-by-sampling-unit incidence matrix ${W_{ij};i=1,2,\dots,S,j=1,2,\dots,t}$ with $S$ rows and $t$ columns, where $W_{ij} = 1$ if element $i$ is covered in sampling unit $j$, and $W_{ij} = 0$ otherwise.
+During a fuzzing campaign, suppose we record $t$ sampling units. The incidence data forms an element$\times$sampling-unit incidence matrix ${W_{ij};i=1,2,\dots,S,j=1,2,\dots,t}$ with $S$ rows and $t$ columns, where $W_{ij} = 1$ if element $i$ is covered in sampling unit $j$, and $W_{ij} = 0$ otherwise.
 
 The incidence frequency $Y_i$ represents the number of sampling units in which element $\mathcal{D}_i$ is covered; i.e., $Y_i=\sum_{j=1}^{t}W_{ij}$. A coverage element $\mathcal{D}_i$ that has not been covered by any sampling unit will have an incidence frequency of zero; i.e., $Y_i=0$.
 
@@ -356,7 +363,45 @@ Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ i
 %
 %Assuming that the fuzzer's search space contains $S$ species, indexed by ${1,2,\dots,S}$. Without loss of generality, assume we have sampled $t$ sampling units, indexed by $1,2,\dots,t$, where each sampling unit represents a set of test inputs generated during a certain period of the ongoing fuzzing campaign. A species could be any choice of a program behaviour such as bugs or coverage elements like program paths, branches, or functions. It is assumed that these sampling units are randomly and independently sampled.
 % ---- End Model
-\input{estimation.tex}
+% --- Estimation
+\section{Reachability Estimation in Fuzzing} \label{sec:reachability}
+
+With the introduction of the STADS statistical framework and the growing adoption of fuzzing, understanding a fuzzer's detection capacity has become increasingly important. As a result, statistical techniques for estimating maximum reachability $\hat{S}$ have gained prominence \cite{stads,reachability_2023,roadmap}. Most estimators of $\hat{S}$ that conform to the probabilistic model in \autoref{sec:model} are introduced to fuzzing from the well-established field of ecological bio-statistics. However, challenges affecting the accuracy and precision of these estimates have been discussed both in the original STADS framework \cite{stads} and in more recent evaluations \cite{reachability_2023} of estimator performance. We discuss two critical challenges in more detail that we believe have a significant impact on reachability estimation and its evaluation in fuzzing.
+
+\subsection*{C1: Adaptive bias}
+A key statistical challenge in greybox fuzzing is \emph{adaptive bias}: as coverage-increasing inputs are added as new seeds, the distribution $\pi_i$ for $i: 1 \leq i \leq S$ evolves throughout the fuzzing campaign \cite{doctoral_2021}. A fundamental assumption of the Bernoulli Product model—common in statistics and machine learning—is that samples are independent and identically distributed (\emph{iid}), meaning the distribution of detection probabilities remains unchanged over time.  
+
+This assumption holds in blackbox fuzzing campaigns where no new seeds are added to the seed corpus while the fuzzer is running. However, in greybox fuzzing, which is the predominant fuzzing technique today, the outcome of one sample influences subsequent samples, violating the independence assumption \cite{entropic,stads,doctoral_2021}. Consequently, applying existing statistical estimators to greybox fuzzing leads to \emph{adaptive bias}, where estimates systematically over- or under-estimate the true value in greybox campaigns.
+
+Therefore, developing novel estimation strategies that correct adaptive bias in statistical estimation of key performance parameters is crucial for assessing greybox fuzzing progress and predicting its future trajectory. Recent advancements have introduced techniques that mitigate adaptive bias to estimate \emph{residual risk} \cite{residual2021} and to extrapolate \emph{coverage rate} \cite{coveragerate2024} in greybox fuzzing. However, state-of-the-art reachability estimators continue to be affected by adaptive bias.
+
+\subsection*{C2: Challenge of Establishing Ground Truth for Evaluation}
+
+As with other software testing techniques, fuzzing aims to progressively explore diverse program behaviors—such as increasing code coverage or triggering distinct faults—over time. However, a fundamental challenge in evaluating the effectiveness of a fuzzing campaign lies in the absence of an absolute ground truth. Specifically, we can never be certain that all reachable program behaviors have been exercised, regardless of how long the fuzzer runs \cite{dijkstra2002ewd}. There always exists a non-zero probability that previously undiscovered behaviors may emerge as new test inputs are generated \cite{residual2021}.
+
+Despite this inherent uncertainty, the effectiveness of a fuzzing approach is often evaluated based on its maximum observed reachability within a fixed time or resource budget. For example, widely used benchmarks such as Fuzzbench \cite{metzman2021fuzzbench} and Magma \cite{hazimeh2020magma} assess fuzzers by measuring the coverage achieved after executing for a predetermined duration (e.g., 24 hours in the case of Fuzzbench). However, such evaluations can be misleading in scenarios where novel program behaviors are discovered beyond the allotted time window. This limitation underscores the need for more conclusive and robust quantitative techniques to assess fuzzing effectiveness—particularly methods grounded in data-driven estimation of maximum reachability. Still, establishing the ground truth remains a cornerstone for reliably evaluating such quantitative reachability measures.
+
+\subsection{Existing Methods in Approximating Ground-Truth for Maximum Reachability}
+
+Even though achieving a 100\% guarantee of exhausting all possible program behaviors is inherently unattainable, the longer a fuzzing campaign proceeds without encountering new behaviors, the lower the probability of discovering additional ones becomes. This diminishing discovery rate, in turn, increases our confidence in treating the current state as an empirical approximation of the ground truth for maximum reachability. However, recent empirical evidence based on extensive 7-day AFL++ \cite{aflpp} fuzzing campaigns across 32 real-world C programs demonstrates that reaching a true asymptote in coverage is often elusive in practice \cite{reachability_2023}. While coverage curves may appear to saturate when plotted on a linear scale, this effect is far less discernible on a logarithmic scale—suggesting that new behaviors continue to emerge at a slow but non-negligible rate. This observation further complicates the task of defining and approximating ground truth in fuzzing evaluation. Moreover, the same study highlights the limitations of using static analysis for estimating maximum reachable coverage, revealing both under- and over-approximation in practice. 
+
+To address this challenge, the current fuzzing literature proposes state-of-the-art strategies to approximate ground-truth reachability, particularly for evaluating statistical estimators of maximum reachability:
+
+\begin{enumerate}
+    \item \textbf{Using small-scale programs as subjects:} When the subject program is relatively small and contains only a limited number of distinct reachable behaviors, fuzzers are more likely to achieve saturation within a feasible time frame. This makes such programs suitable proxies for maximum reachability estimator evaluations with ground-truth.
+    
+    \item \textbf{Bootstrapping from campaign data:} After executing a fuzzer for a sufficiently long period—ideally until the coverage or bug discovery curve exhibits signs of plateauing—bootstrap resampling can be applied to the observed data. The key intuition is that the relationship between the empirical distribution of discovered behaviors and the underlying theoretical population mirrors the relationship between bootstrap samples and the empirical distribution. This method enables statistical approximation of ground-truth reachability without requiring absolute exhaustiveness.
+\end{enumerate}
+
+\subsection{Drawbacks of Existing Ground-Truth Approaches}
+
+Despite efforts to approximate ground truth in fuzzing evaluation, existing methods, particularly those relying on small-scale programs, have significant limitations. While small programs enable faster saturation of program behaviors, they fail to reflect the complexity and diversity of real-world systems, which often exhibit a highly skewed distribution of behaviors—similar to ecological environments with a few abundant behaviors and many rare ones. In contrast, smaller programs tend to have a less skewed distribution of species, leading to an overestimation of fuzzing estimators’ accuracy. This discrepancy results in misleading conclusions when performance estimators derived from small-scale programs are applied to larger, more complex systems, where the species distribution is less predictable. Consequently, the primary drawback of using small-scale programs for ground-truth approximation is the risk of overstating the effectiveness of fuzzing approaches when applied to real-world software.
+
+In the case of bootstrapping, the core assumption—that the empirical distribution obtained from a fuzzing campaign reasonably approximates the true underlying distribution of all possible program behaviors—fails to satisfy when the campaign has not yet thoroughly explored critical regions of the codebase or when input generation is inherently biased. This assumption further relies on the expectation that the future trajectory of behavior discovery will not significantly deviate from its current trend, implying that species accumulation will smoothly approach saturation. However, without additional quantitative evidence to support the stability of this trajectory—such as statistical indicators of diminishing returns or convergence metrics—such assumptions remain speculative. In the absence of such validation, bootstrapped estimates may result in substantial over- or under-estimations of maximum reachability, ultimately undermining the reliability of fuzzing effectiveness evaluations.  
+
+These limitations highlight the need for more robust, scalable, and accurate methods of defining and approximating ground truth in fuzzing evaluation, particularly as programs grow in size and complexity.
+
+% --- End Estimation
 \input{methodology.tex}
 \input{setup.tex}
 \input{related.tex}
