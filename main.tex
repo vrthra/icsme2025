@@ -177,12 +177,12 @@ remains a challenge, which raises a fundamental question:
 
 Recent researches have proposed \emph{species richness estimators} from
 biostatistics~\cite{chao2016species} as a principled approach to estimate
-the reachable coverage of a fuzzing campaign~\cite{reachability_2023,stads}.
+the reachable coverage of a fuzzing campaign~\cite{stads}.
 These estimators treat fuzzing as a statistical sampling process in which
 each test input belongs to one or more program execution behaviors,
 for example, reaching a program element, which can then be leveraged to
 estimate the total possible number of such behaviours such as the total
-possible reachable elements in a program~\cite{stads,reachability_2023}.
+possible reachable elements in a program~\cite{stads}.
 % (e.g., a branch, path, function, or bug).
 
 % Under this analogy, statistical estimators such as Chao2 \cite{chao2017thirty} have been explored to approximate total reachable coverage from partially observed data.
@@ -193,8 +193,11 @@ of these estimators is difficult. The main issue is that, to evaluate such
 estimators, we need a benchmark of several large complex programs where
 maximum reachability is known. Unfortunately, establishing the maximum
 reachability is impossible except for trivial programs. Hence,
-rearchers~\cite{reachability_2023} have resorted to using small
-programs, fuzzed to saturation as an alternative.
+rearchers have resorted to using small
+programs, fuzzed to saturation as an alternative~\cite{reachability_2023}.
+% Using this approach, they have further shown that the reliability of such
+% estimators increase when the number of singletons (those elements that
+% are reached by a single)
 This approach is not ideal as performance of an estimator in small
 programs may not representative of the performance of an estimator in complex
 real-world programs.
@@ -230,18 +233,32 @@ evaluating the reliability of estimators, but also for other evaluation
 tasks that require complex programs such as evaluating fuzzers,
 fault localization techniques, program repair techniques, and so on.
 
-
-Due to the difficulty of obtaining concrete ground truth for $S$, we investigate alternative, non-ground-truth-based methods for evaluating estimator performance. One important yet often overlooked factor in this context is the definition of the \emph{sampling unit}—that is, how fuzzing inputs are grouped when computing incidence statistics. While prior studies commonly adopt fixed temporal intervals (e.g., 15-minute bins), this arbitrary choice directly impacts the counts of singletons and doubletons, which are critical to estimators such as Chao2. Consequently, it remains unclear whether such estimators produce stable and consistent results under varying sampling granularities. To be considered reliable, an estimator should yield consistent point estimates of maximum reachability across different sampling unit definitions, provided the total campaign length is held constant.
-
-In this paper, we systematically investigate the reliability of incidence-based statistical estimators for fuzzing effectiveness. Drawing on principles from ecology and mutation testing, we introduce a new framework to assess estimator behavior across sampling granularities and examine whether such estimators offer consistent, precise, and upper-bounding estimates of maximum reachability. 
-
 \begin{figure*}
   \includegraphics[width=\textwidth]{basiccfg.pdf}
   \caption{Control flow to context-free grammar}
   \label{fig:cfg}
 \end{figure*}
 
-In this paper, we make the following contributions.
+While synthetic benchmarks are a useful alternative, is it possible to use
+real-world programs even if ground-truth (the maximum reachability) is not
+known? A recent research on evaluating the reliability of biostatistics based
+estimators for mutation analysis~\cite{kuznetsov2024empirical} provides a
+solution. The researchers point out that the \emph{sampling units} used in
+species richness estimators should not have a significant effect on the final
+estimate. In previous research on coverage estimation~\cite{reachability_2023},
+the sampling-unit used is the time interval. That is, the incidence data of
+each 15-minutes bin was used as the sampling unit. Since the 15-minute interval
+is arbitrary, it stands to reason that changing the timing granularity should
+not impact the final estimate. Hence, we propose to evaluate the reliability of
+maximum coverage estimators under varying granularity of sampling interval,
+for the same fuzzing campaign duration.
+
+% To be considered reliable, an estimator should yield consistent point estimates of maximum reachability across different sampling unit definitions, provided the total campaign length is held constant.
+
+% Hence, in this paper, we propose to systematically investigate the reliability
+% of incidence-based statistical estimators for maximum coverage.
+
+We make the following contributions.
 
 \begin{itemize}
     \item \textbf{Critical Analysis of Ground-Truth Methods:} We highlight limitations in current approaches to establishing reachability ground truth, including saturation of small programs and bootstrapped distributions.
