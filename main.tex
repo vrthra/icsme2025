@@ -186,9 +186,16 @@ possible reachable elements in a program~\cite{stads,reachability_2023}.
 
 % Under this analogy, statistical estimators such as Chao2 \cite{chao2017thirty} have been explored to approximate total reachable coverage from partially observed data.
 
-However, evaluating the accuracy and reliability (in other words bias and variability) of these estimators is difficult, as it critically depends on access to ground truth for maximum reachability $S$, which is exceedingly challenging to establish for non-trivial programs. A recent seminal work by Liyanage et al.~\cite{reachability_2023} proposed two strategies to approximate $S$: (1) using \emph{small-scale} programs that can reach coverage saturation within a reasonable time window, and (2) applying \emph{bootstrapping} (i.e., resampling) techniques based on the empirical species distribution observed in previously collected campaign data. However, both approaches have notable limitations. Small programs often fail to reflect the behavioral complexity and diversity of real-world software, leading to overly optimistic estimator performance. Meanwhile, bootstrapping may poorly approximate the missing mass \cite{residual2021} and can omit behaviors that only emerge late in the campaign.
+However, evaluating the accuracy and reliability
+%(in other words bias and variability)
+of these estimators is difficult. The main issue is that, to evaluate such
+estimators, we need a benchmark of several large complex programs where
+maximum reachability is known. Unfortunately, establishing the maximum
+reachability is impossible except for trivial programs.
 
-\textcolor{red}{ground truth to reliability bridge}
+% A recent seminal work by Liyanage et al.~\cite{reachability_2023} proposed two strategies to approximate $S$: (1) using \emph{small-scale} programs that can reach coverage saturation within a reasonable time window, and (2) applying \emph{bootstrapping} (i.e., resampling) techniques based on the empirical species distribution observed in previously collected campaign data. However, both approaches have notable limitations. Small programs often fail to reflect the behavioral complexity and diversity of real-world software, leading to overly optimistic estimator performance. Meanwhile, bootstrapping may poorly approximate the missing mass \cite{residual2021} and can omit behaviors that only emerge late in the campaign.
+
+% \textcolor{red}{ground truth to reliability bridge}
 
 Due to the difficulty of obtaining concrete ground truth for $S$, we investigate alternative, non-ground-truth-based methods for evaluating estimator performance. One important yet often overlooked factor in this context is the definition of the \emph{sampling unit}—that is, how fuzzing inputs are grouped when computing incidence statistics. While prior studies commonly adopt fixed temporal intervals (e.g., 15-minute bins), this arbitrary choice directly impacts the counts of singletons and doubletons, which are critical to estimators such as Chao2. Consequently, it remains unclear whether such estimators produce stable and consistent results under varying sampling granularities. To be considered reliable, an estimator should yield consistent point estimates of maximum reachability across different sampling unit definitions, provided the total campaign length is held constant.
 
