@@ -24,6 +24,7 @@
 \hypersetup{pdftitle={\mytitle},
 colorlinks=true,linkcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue
 }
+\usepackage{cleveref}
 
 \usepackage{subfig,paralist}
 \usepackage{pifont}
@@ -198,13 +199,47 @@ This approach is not ideal as performance of an estimator in small
 programs may not representative of the performance of an estimator in complex
 real-world programs.
 
-% A recent seminal work by Liyanage et al.~\cite{reachability_2023} proposed two strategies to approximate $S$: (1) using \emph{small-scale} programs that can reach coverage saturation within a reasonable time window, and (2) applying \emph{bootstrapping} (i.e., resampling) techniques based on the empirical species distribution observed in previously collected campaign data. However, both approaches have notable limitations. Small programs often fail to reflect the behavioral complexity and diversity of real-world software, leading to overly optimistic estimator performance. Meanwhile, bootstrapping may poorly approximate the missing mass \cite{residual2021} and can omit behaviors that only emerge late in the campaign.
+We propose an alternative approach to overcome this difficulty. We note that
+in programs such as parsers (which are one of the major subjects for fuzzing)
+the control-flow of a program along with its data-flow determines the
+complexity of the program, and hence, determines the difficulty
+experienced in reaching the program elements. we also note that the
+control-flow of any structured program can be represented as a context-free
+grammar~\Cref{fig:cfg}.
 
-% \textcolor{red}{ground truth to reliability bridge}
+The interesting fact here is that it is possible to generate arbitrary
+context-free grammars. Furthermore, one can also fine-tune the complexity
+of such grammars generated based on several dimensions such as the size
+of the grammar, the number of direct and indirect recursions allowed, the
+number of linear-recursive rules etc.
+% , the general size of the language
+% corresponding to the universe of all strings, and finally the VC-dimension
+% of the language.
+We further note that converting a context-free grammar to recursive descent
+parsers is well known, and produces parsers which have similarly complex
+control-flows.
+
+Our proposal is then to leverage such arbitrary generated complex
+context-free grammars into parsers, and use such parsers as benchmarks for
+estimating the reliability of reachability estimators. We propose to compare
+the difficulty of fuzzers when faced with real-world parsers to these
+generated parsers to ensure that the generated benchmarks are similar to
+real-world programs in complexity. If they prove equivalent in complexity,
+such generated, and ever-renewable benchmarks may not only be suitable for
+evaluating the reliability of estimators, but also for other evaluation
+tasks that require complex programs such as evaluating fuzzers,
+fault localization techniques, program repair techniques, and so on.
+
 
 Due to the difficulty of obtaining concrete ground truth for $S$, we investigate alternative, non-ground-truth-based methods for evaluating estimator performance. One important yet often overlooked factor in this context is the definition of the \emph{sampling unit}—that is, how fuzzing inputs are grouped when computing incidence statistics. While prior studies commonly adopt fixed temporal intervals (e.g., 15-minute bins), this arbitrary choice directly impacts the counts of singletons and doubletons, which are critical to estimators such as Chao2. Consequently, it remains unclear whether such estimators produce stable and consistent results under varying sampling granularities. To be considered reliable, an estimator should yield consistent point estimates of maximum reachability across different sampling unit definitions, provided the total campaign length is held constant.
 
 In this paper, we systematically investigate the reliability of incidence-based statistical estimators for fuzzing effectiveness. Drawing on principles from ecology and mutation testing, we introduce a new framework to assess estimator behavior across sampling granularities and examine whether such estimators offer consistent, precise, and upper-bounding estimates of maximum reachability. 
+
+\begin{figure*}
+  \includegraphics[width=\textwidth]{basiccfg.pdf}
+  \caption{Control flow to context-free grammar}
+  \label{fig:cfg}
+\end{figure*}
 
 In this paper, we make the following contributions.
 
