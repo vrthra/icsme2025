@@ -159,7 +159,36 @@ sampling units.
 
 \end{abstract}
 
-\input{intro.tex}
+
+\section{Introduction}
+
+Achieving 100\% coverage in software testing remains seemingly impossible goal for most real-world programs, except for the most trivial cases \cite{horgan1994achieving}. As software systems increase in complexity, their input and execution spaces expand dramatically, rendering exhaustive testing generally infeasible \cite{knight1996exhaustive}. Even \emph{fuzzing}—despite its strength as an automated testing technique capable of generating large volumes of inputs—is inherently bounded in its \emph{maximum reachability}, falling short of exercising all possible coverage elements in the target program \cite{fell2017review}. Yet, quantifying this maximum reachability remains a challenge, which raises a fundamental question: \emph{How close is a fuzzing campaign to achieving its maximum reachable coverage?}
+
+Recent researches have proposed statistical estimators as a pertinent candidate—particularly \emph{species richness estimators} from ecological biostatistics—as a principled approach to estimate the reachable coverage of a fuzzing campaign \cite{reachability_2023,stads}. These estimators treat fuzzing as a statistical sampling process in which each test input belongs to one or more program behaviors (e.g., a branch, path, function, or bug). Estimating the number of \emph{unseen} behaviors thus parallels the ecological problem of estimating unobserved species in a population \cite{chao2016species}. Under this analogy, statistical estimators such as Chao2 \cite{chao2017thirty} have been explored to approximate total reachable coverage from partially observed data.
+
+However, evaluating the accuracy and reliability (in other words bias and variability) of these estimators is difficult, as it critically depends on access to ground truth for maximum reachability $S$, which is exceedingly challenging to establish for non-trivial programs. A recent seminal work by Liyanage et al.~\cite{reachability_2023} proposed two strategies to approximate $S$: (1) using \emph{small-scale} programs that can reach coverage saturation within a reasonable time window, and (2) applying \emph{bootstrapping} (i.e., resampling) techniques based on the empirical species distribution observed in previously collected campaign data. However, both approaches have notable limitations. Small programs often fail to reflect the behavioral complexity and diversity of real-world software, leading to overly optimistic estimator performance. Meanwhile, bootstrapping may poorly approximate the missing mass \cite{residual2021} and can omit behaviors that only emerge late in the campaign.
+
+\textcolor{red}{ground truth to reliability bridge}
+
+Due to the difficulty of obtaining concrete ground truth for $S$, we investigate alternative, non-ground-truth-based methods for evaluating estimator performance. One important yet often overlooked factor in this context is the definition of the \emph{sampling unit}—that is, how fuzzing inputs are grouped when computing incidence statistics. While prior studies commonly adopt fixed temporal intervals (e.g., 15-minute bins), this arbitrary choice directly impacts the counts of singletons and doubletons, which are critical to estimators such as Chao2. Consequently, it remains unclear whether such estimators produce stable and consistent results under varying sampling granularities. To be considered reliable, an estimator should yield consistent point estimates of maximum reachability across different sampling unit definitions, provided the total campaign length is held constant.
+
+In this paper, we systematically investigate the reliability of incidence-based statistical estimators for fuzzing effectiveness. Drawing on principles from ecology and mutation testing, we introduce a new framework to assess estimator behavior across sampling granularities and examine whether such estimators offer consistent, precise, and upper-bounding estimates of maximum reachability. 
+
+In this paper, we make the following contributions.
+
+\begin{itemize}
+    \item \textbf{Critical Analysis of Ground-Truth Methods:} We highlight limitations in current approaches to establishing reachability ground truth, including saturation of small programs and bootstrapped distributions.
+    
+    \item \textbf{Reliability Framework for Estimators:} We propose a novel framework to assess the reliability of species richness estimators based on their ability to produce consistent point estimates across varying sampling unit sizes at equal campaign durations.
+    
+    \item \textbf{Empirical Evaluation on Real-World Programs:} We evaluate this framework on 32 real-world programs and demonstrate that certain estimators yield overlapping confidence intervals and reduced variance across different granularities—indicating estimator reliability.
+    
+    \item \textbf{Assessment of Stopping Criteria:} We re-examine previously proposed stopping criteria and evaluate their effectiveness in identifying when a statistical estimate may serve as a reliable upper bound on maximum reachability.
+
+    \item\textcolor{red}{In this paper we propose a solution to the question of how to interpret the estimate from Chao on time based samples.}
+\end{itemize}
+
+The remainder of this paper is organized as follows. Section~\ref{sec:model} introduces the probabilistic model underlying fuzzing and the assumptions made in statistical reachability estimation. Section~\ref{sec:reachability} discusses current approaches to reachability estimation in fuzzing, including existing methods, their associated challenges, proposed solutions, and known drawbacks. Section~\ref{sec:method} presents our methodology for assessing the reliability of statistical estimators of maximum reachability. Section~\ref{sec:setup} details the experimental setup used to evaluate our approach. Finally, Section~\ref{sec:conclusion} concludes the paper and outlines directions for future research.
 \input{model.tex}
 \input{estimation.tex}
 \input{methodology.tex}
