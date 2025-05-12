@@ -174,7 +174,17 @@ Yet, quantifying the maximum possible coverage (also called \emph{maximum reacha
 remains a challenge, which raises a fundamental question:
 \emph{How close is a fuzzing campaign to achieving its maximum reachable coverage?}
 
-Recent researches have proposed statistical estimators as a pertinent candidate—particularly \emph{species richness estimators} from ecological biostatistics—as a principled approach to estimate the reachable coverage of a fuzzing campaign \cite{reachability_2023,stads}. These estimators treat fuzzing as a statistical sampling process in which each test input belongs to one or more program behaviors (e.g., a branch, path, function, or bug). Estimating the number of \emph{unseen} behaviors thus parallels the ecological problem of estimating unobserved species in a population \cite{chao2016species}. Under this analogy, statistical estimators such as Chao2 \cite{chao2017thirty} have been explored to approximate total reachable coverage from partially observed data.
+Recent researches have proposed \emph{species richness estimators} from
+biostatistics~\cite{chao2016species} as a principled approach to estimate
+the reachable coverage of a fuzzing campaign~\cite{reachability_2023,stads}.
+These estimators treat fuzzing as a statistical sampling process in which
+each test input belongs to one or more program execution behaviors,
+for example, reaching a program element, which can then be leveraged to
+estimate the total possible number of such behaviours such as the total
+possible reachable elements in a program.
+% (e.g., a branch, path, function, or bug).
+
+% Under this analogy, statistical estimators such as Chao2 \cite{chao2017thirty} have been explored to approximate total reachable coverage from partially observed data.
 
 However, evaluating the accuracy and reliability (in other words bias and variability) of these estimators is difficult, as it critically depends on access to ground truth for maximum reachability $S$, which is exceedingly challenging to establish for non-trivial programs. A recent seminal work by Liyanage et al.~\cite{reachability_2023} proposed two strategies to approximate $S$: (1) using \emph{small-scale} programs that can reach coverage saturation within a reasonable time window, and (2) applying \emph{bootstrapping} (i.e., resampling) techniques based on the empirical species distribution observed in previously collected campaign data. However, both approaches have notable limitations. Small programs often fail to reflect the behavioral complexity and diversity of real-world software, leading to overly optimistic estimator performance. Meanwhile, bootstrapping may poorly approximate the missing mass \cite{residual2021} and can omit behaviors that only emerge late in the campaign.
 
