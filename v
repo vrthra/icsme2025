@@ -1,1 +1,1 @@
-vim main.tex
+vim icsme-registered.tex
