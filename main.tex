@@ -258,18 +258,22 @@ for the same fuzzing campaign duration.
 % Hence, in this paper, we propose to systematically investigate the reliability
 % of incidence-based statistical estimators for maximum coverage.
 
-We make the following contributions.
+\noindent{}\textbf{Contributions.}
 
 \begin{itemize}
-    \item \textbf{Critical Analysis of Ground-Truth Methods:} We highlight limitations in current approaches to establishing reachability ground truth, including saturation of small programs and bootstrapped distributions.
-    
-    \item \textbf{Reliability Framework for Estimators:} We propose a novel framework to assess the reliability of species richness estimators based on their ability to produce consistent point estimates across varying sampling unit sizes at equal campaign durations.
-    
-    \item \textbf{Empirical Evaluation on Real-World Programs:} We evaluate this framework on 32 real-world programs and demonstrate that certain estimators yield overlapping confidence intervals and reduced variance across different granularities—indicating estimator reliability.
-    
-    \item \textbf{Assessment of Stopping Criteria:} We re-examine previously proposed stopping criteria and evaluate their effectiveness in identifying when a statistical estimate may serve as a reliable upper bound on maximum reachability.
+  \item \textbf{Synthetic benchmarks for evaluation:} We propose a novel
+framework to generate synthetic program benchmarks that emulates real-world
+programs, and use this to evaluate maximum reachability estimators.
 
-    \item\textcolor{red}{In this paper we propose a solution to the question of how to interpret the estimate from Chao on time based samples.}
+  \item \textbf{Sampling-unit based evaluation of reliability} We will evaluate
+    the reliability of maximum reachability estimators on 32 real-world programs
+    by comparing the estimates under sampling units of diverse granularity.
+
+  % We evaluate this framework on 32 real-world programs and demonstrate that certain estimators yield overlapping confidence intervals and reduced variance across different granularities—indicating estimator reliability.
+    
+% \item \textbf{Assessment of Stopping Criteria:} We re-examine previously proposed stopping criteria and evaluate their effectiveness in identifying when a statistical estimate may serve as a reliable upper bound on maximum reachability.
+
+%\item\textcolor{red}{In this paper we propose a solution to the question of how to interpret the estimate from Chao on time based samples.}
 \end{itemize}
 
 The remainder of this paper is organized as follows. Section~\ref{sec:model} introduces the probabilistic model underlying fuzzing and the assumptions made in statistical reachability estimation. Section~\ref{sec:reachability} discusses current approaches to reachability estimation in fuzzing, including existing methods, their associated challenges, proposed solutions, and known drawbacks. Section~\ref{sec:method} presents our methodology for assessing the reliability of statistical estimators of maximum reachability. Section~\ref{sec:setup} details the experimental setup used to evaluate our approach. Finally, Section~\ref{sec:conclusion} concludes the paper and outlines directions for future research.
