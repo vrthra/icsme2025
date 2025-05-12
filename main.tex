@@ -439,22 +439,51 @@ as context-sensitivity.
 
 \noindent\textbf{Scalability and Applicability:} This methodology is designed to generate large-scale C parsers that consist of thousands of lines of code and complex control-flow.
 
-\subsection{Assessing Reliability of the Estimators of \texorpdfstring{$\hat{S}$}{S-hat}}
+\subsection{Assessing Reliability of the Estimators of Stopping Criterion}
 
-Prior empirical research on estimating maximum reachable coverage in fuzzing campaigns—under the Bernoulli product model—has shown that statistical estimators systematically underestimate true reachability until near saturation, a phenomenon termed \emph{false peaks} by \cite{reachability_2023}. This negative bias is largely inevitable in early stages due to the insufficiency of fuzzing data and the heterogeneous species diversity, which limits accurate approximation of the species distribution. These limitations prompt a critical question: \emph{How can we ensure that statistical estimators provide reliable approximations of maximum reachability $S$ in fuzzing campaigns?}
 
-\result{\textbf{Intuition:} While incidence-based statistical estimators of fuzzing effectiveness are sensitive to the sampling unit size ($r$), a reliable estimator should produce overlapping point estimates for $S$—with varying variance but consistent expectation—when evaluated over equal-length campaigns.}
-
-The incidence frequency counts—particularly singletons ($f_1$) and doubletons ($f_2$)—are sensitive to the granularity of the sampling unit ($r$). Using individual inputs ($r=1$) yields the most fine-grained data, while aggregating inputs (e.g., over time intervals) reduces resolution. Aggregation tends to decrease $f_1$ and increase higher-frequency counts, as rare elements may co-occur within a unit. Since estimators like Chao2 depend directly on $f_1$ and $f_2$, the point estimate of species richness $\hat{S}$ may vary with changes in $r$, even under equal-length campaigns. Despite this sensitivity, the choice of $r$ is often arbitrary; for instance, \cite{reachability_2023} adopts 15-minute intervals without justification.
-
-However, since the maximum reachability $S$ is a finite quantity for any given fuzzing campaign, a reliable estimator should approximate it within reasonable error bounds—despite variability in incidence frequencies introduced by changes in the sampling unit definition—provided that the estimation is performed at the same time point since the campaign's start. Leveraging this property, we evaluate whether estimators of maximum reachability $S$ yield consistent point estimates with overlapping confidence intervals, while allowing for differences in estimation accuracy (i.e., variability) across fuzzing campaigns with different sampling unit definitions $r$.
+% TODO: This should be in the previous section. Not here.
+% Prior empirical research on estimating maximum reachable coverage in fuzzing campaigns—under the Bernoulli product model—has shown that statistical estimators systematically underestimate true reachability until near saturation, a phenomenon termed \emph{false peaks} by \cite{reachability_2023}. This negative bias is largely inevitable in early stages due to the insufficiency of fuzzing data and the heterogeneous species diversity, which limits accurate approximation of the species distribution. These limitations prompt a critical question: \emph{How can we ensure that statistical estimators provide reliable approximations of maximum reachability $S$ in fuzzing campaigns?}
+% 
+% \result{\textbf{Intuition:} While incidence-based statistical estimators of fuzzing effectiveness are sensitive to the sampling unit size ($r$), a reliable estimator should produce overlapping point estimates for $S$—with varying variance but consistent expectation—when evaluated over equal-length campaigns.}
+% 
+% The incidence frequency counts—particularly singletons ($f_1$) and doubletons ($f_2$)—are sensitive to the granularity of the sampling unit ($r$). Using individual inputs ($r=1$) yields the most fine-grained data, while aggregating inputs (e.g., over time intervals) reduces resolution. Aggregation tends to decrease $f_1$ and increase higher-frequency counts, as rare elements may co-occur within a unit. Since estimators like Chao2 depend directly on $f_1$ and $f_2$, the point estimate of species richness $\hat{S}$ may vary with changes in $r$, even under equal-length campaigns. Despite this sensitivity, the choice of $r$ is often arbitrary; for instance, \cite{reachability_2023} adopts 15-minute intervals without justification.
+% 
+% However, since the maximum reachability $S$ is a finite quantity for any given fuzzing campaign, a reliable estimator should approximate it within reasonable error bounds—despite variability in incidence frequencies introduced by changes in the sampling unit definition—provided that the estimation is performed at the same time point since the campaign's start. Leveraging this property, we evaluate whether estimators of maximum reachability $S$ yield consistent point estimates with overlapping confidence intervals, while allowing for differences in estimation accuracy (i.e., variability) across fuzzing campaigns with different sampling unit definitions $r$.
 
 \textcolor{red}{Stopping Criterion Evaluation:
 Evaluate the stopping criterion in checking the reliability of reachability estimators. (Applicable beyond f1 <f2) By evaluating f1 actually becomes an upper bound to f0.
 }
 % --- End Methodology
-\input{setup.tex}
-\input{related.tex}
+
+\section{Experimental Setup} \label{sec:setup}
+
+\subsection{Research Questions}
+
+This study addresses the following research questions:
+
+\begin{itemize}
+    \item \textbf{RQ1:} How accurately do statistical estimators of maximum reachability approximate the ground truth obtained using our proposed ensemble measurement approach?
+    
+    \item \textbf{RQ2:} How does the performance of estimators based on our proposed ground truths compare to their performance using ground truths from prior studies?
+    
+    \item \textbf{RQ3:} To what extent are the estimates of maximum reachability $S$ sensitive to changes in the sampling unit size $r$?
+\end{itemize}
+
+\subsection{Fuzzers and Subject Programs}
+
+For our experiments, we use AFL++ \cite{aflpp}, a widely recognized state-of-the-art greybox fuzzer known for its performance and extensive adoption in recent research, particularly in reachability estimation studies. Using the same fuzzer as prior work enables direct and fair comparisons when evaluating estimator performance (RQ2).
+
+We select a diverse set of real-world C programs from the FuzzBench platform \cite{metzman2021fuzzbench}, which provides a standardized fuzzing benchmarking environment. To ensure comparability with earlier studies (specifically for RQ2), we include all subject programs used in \cite{reachability_2023}, along with several additional targets that are compatible with AFL++ and suitable for large-scale fuzzing.
+
+
+\section{Related Work}
+
+Reachable program behaviors (e.g. code coverage and discovered bugs) determine the \emph{effectiveness} of a software testing process. For non-trivial programs, exhaustively exercising all possible behaviors is infeasible. Consequently, testing is often viewed as a means to demonstrate the presence of bugs, but not their absence~\cite{dijkstra2022reliability}. Despite this limitation, substantial effort has been directed toward increasing maximum reachability to enhance software security and reliability. Nevertheless, determining reachability remains a fundamental challenge in software testing. In fact, an efficient and precise determination of reachable code would effectively resolve the software verification problem~\cite{reachability_2023}. 
+
+Efforts to approximate reachability quantitatively have gained traction in the security domain, despite inherent difficulties. Empirical studies indicate that establishing the reachability of certain code regions is particularly challenging in large, complex code bases, using both static and dynamic analysis techniques~\cite{reachability_questions}. Static analysis methods, such as symbolic execution, often suffer from over- or under-approximation when estimating reachable coverage~\cite{reachability_2023,Aniche2015}. For instance, Nikoli\'{c} and Spoto~\cite{reachability_program_vars} proposed approximating the reachability of program variables as a new abstract domain for static analysis. While their approach yields over-approximations, authors argue that it can be conservatively applied to identify unreachable code. Similarly, Mikol\'{a}\v{s} et al.~\cite{annotate_reachability} leveraged annotated code to define unreachability conditions and proposed an efficient algorithm for detecting unreachable code.
+
+To assess reachability or unreachability in dynamic analysis, both constraint-solving techniques such as SMT\footnote{SMT—Satisfiability Modulo Theory} and data-driven estimation methods have been explored. Naus et al.~\cite{naus2023low} proposed a technique for automatically generating preconditions to trigger specific post-conditions (e.g., bugs) using low-level code analysis. Similarly, Liew et al.~\cite{Liew2019} demonstrated how to encode SMT formulas within coverage-guided fuzzers to discover inputs that reach targeted program locations. In contrast, statistical approaches directly attempt to estimate the test effectiveness (aka maximum reachability) through observed behaviors. The pioneering STADS\footnote{STADS—Software Testing As Discovery of Species} framework~\cite{stads} introduced a suite of bio-statistical estimators by modeling fuzzing as a statistical sampling process. A recent evaluation of these estimators highlighted key challenges associated with reachability estimation~\cite{reachability_2023}. When applied to estimate the number of killable mutants in mutation analysis, Kuznetsov et al.~\cite{killable} empirically demonstrated the unreliability of STADS estimators due to variations in sampling unit definitions. This finding, together with other recent studies, underscores the need for \emph{structure-aware} estimators that incorporate internal program structure, as opposed to structure-agnostic alternatives~\cite{statreachability_2023}.
 
 
 \section{Conclusion}
