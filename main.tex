@@ -405,32 +405,35 @@ These limitations highlight the need for more robust, scalable, and accurate met
 % --- End Estimation
 % --- Methodology
 \section{Methodology} \label{sec:method}
-
-
-%\emph{How can we concretely evaluate the accuracy and reliability of statistical estimators in approximating maximum reachability $S$ in fuzzing campaigns?}
-
-Due to the limitations discussed in \autoref{sec:reachability} regarding current approaches for obtaining ground truth in maximum reachability estimators, we propose a novel methodology that enables the derivation of the exact ground truth for a fuzzing subject. This approach leverages the syntactic constraints of input formats via context-free grammars and guides input generation using control-flow feedback from the target program.
-
+We next describe our proposed methodology for overcoming the limitations discussed in \Cref{sec:reachability}.
 \subsection{Evaluating Estimators of \texorpdfstring{$\hat{S}$}{S-hat} Against Accurate Ground Truth}
+To overcome the problem due to non-availability of complex programs with available
+maximum coverage, we propose a novel methodology.
 
-Our method combines grammar-based input generation with dynamic program instrumentation to systematically explore the reachable code space of a program under test $\mathcal{P}$. The approach comprises the following key components: (i) defining a formal grammar to ensure syntactic validity of inputs, (ii) instrumenting the program to monitor execution paths, and (iii) using coverage feedback to adaptively generate new inputs that traverse previously unexplored control-flow paths.
-\vspace{0.5em}
+We note that any structured program has a fixed control-flow graph composed of
+the following elements. (1) sequence of nodes representing a linear flow of execution (2) branching nodes
+representing conditionals and switch/case statements in code (3) loops that represent iterative statements
+in code and (4) procedure calls. Each of these elements can be represented by
+an element in a non left-recursive context-free grammar. The details are given in \Cref{fig:cfg}.
+Conversely, given any non left-recursive context-free grammar, we can generate a
+recursive-descent parser by using the following rules:
+(1) Any nonterminal symbol is turned into a procedure in the parser.
+(2) Each production rule is also turned into a procedure in the parser.
+(3) The particular rule to be used to parse is based on the \emph{lookahead}
+corresponding to each rule that matches the current symbol.
+(4) Any linear recursive nonterminal-rule combination is converted into a \texttt{while} loop.
 
-\noindent\textbf{Grammar-Based Input Generation: }We begin by defining a context-free grammar (CFG) that describes the structure of valid inputs accepted by the $\mathcal{P}$. This grammar can be constructed manually from the program specification, or extracted automatically using tools such as ANTLR or Tree-Sitter. The CFG enables the generation of syntactically valid test cases, reducing the likelihood of inputs being rejected early due to parsing errors.
+Following in this fashion, we get a parser that directly corresponds to the context-free
+grammar. The important thing to note here is that the grammar complexity can be
+precisely tuned based on the following parameters
+(1) The number of nonterminal symbols in the grammar
+(2) The number of production rules
+(3) The number of alphabets in the language
+(4) The amount of direct and indirect recursion
+(5) The length of individual rules
+(6) The VC dimension of the language.
 
-Given a CFG $\mathcal{G}$, we construct a probabilistic grammar-based fuzzer that generates inputs by recursively expanding non-terminals according to production rules. To increase diversity, rule selection is initially uniform but is later biased using feedback from program execution.
-\vspace{0.5em}
 
-\noindent\textbf{Control-Flow Feedback and Coverage Tracking:} To guide the input generation process toward unexplored behavior, we instrument the $\mathcal{P}$ using a coverage measurement framework such as \texttt{gcov}, \texttt{LLVM Sanitizers}, or \texttt{AFL++}’s built-in instrumentation. We track code coverage metrics such as basic blocks, edge transitions, and function calls. For each generated input, the corresponding execution trace is analyzed to determine whether it results in new coverage.
-
-Inputs that trigger novel control-flow paths are retained and used as seeds for further mutation and grammar-driven recombination. This ensures that exploration prioritizes semantically distinct regions of the program's execution space.
-\vspace{0.5em}
-
-\noindent\textbf{Adaptive Input Evolution: } To maximize coverage, we employ an adaptive fuzzing loop that continuously refines the input generation process based on historical coverage data. When an input results in increased coverage, the associated grammar rule probabilities are adjusted to favor similar structures in future generations. This mechanism biases the input generation process toward syntactic patterns that are more likely to exercise deeper or less frequently executed code paths.
-\vspace{0.5em}
-
-\noindent\textbf{Ground Truth Construction:} We terminate the fuzzing campaign once coverage plateaus, indicating that no further inputs lead to new control-flow discoveries over a predefined number of iterations. The union of all observed coverage paths is then used to construct an empirical upper bound on reachable program behavior. This set serves as the exact ground truth for evaluating maximum reachability estimators.
-\vspace{0.5em}
 
 \noindent\textbf{Scalability and Applicability:} This methodology is designed to be applicable to large-scale C programs that consist of thousands of lines of code and complex control-flow. By ensuring syntactic correctness and guiding input generation using precise control-flow instrumentation, our approach enables deep semantic exploration of the PUT without exhaustive enumeration or symbolic execution. Furthermore, it is compatible with modern fuzzing frameworks such as \texttt{AFL++}, \texttt{Superion}, and \texttt{Angora}, making it a practical foundation for evaluating reachability estimation techniques.
 
