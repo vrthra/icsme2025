@@ -1,8 +1,8 @@
 \begin{figure*} %{r}{7cm} %[12]
-\begin{subfigure}[h]{0.24\textwidth} %22 min
+  \centering
+\begin{subfigure}[h]{0.30\textwidth} %22 min
 %\begin{subfigure}
-\lstset{numbers=left,xleftmargin=2em,
-numberstyle=\color{lightgray}
+\lstset{numbers=left,xleftmargin=2em, numberstyle=\color{lightgray}
 } %frame=single,framexleftmargin=1.5em}
 \begin{lstlisting}[style=Python, escapechar=|,numbersep=2pt]
 def bsearch(x, v, n):
@@ -20,7 +20,7 @@ def bsearch(x, v, n):
 \end{lstlisting}
 \vspace{60pt}
 \end{subfigure}
-\begin{subfigure}[h]{0.29\textwidth} %25 min
+\begin{subfigure}[h]{0.30\textwidth} %25 min
 %\begin{subfigure}
 \lstset{numbers=left,xleftmargin=2em,
 numberstyle=\color{lightgray}
@@ -46,7 +46,7 @@ def bsearch(x, v, n):
   return None
 \end{lstlisting}
 \end{subfigure}
-\begin{subfigure}[h]{0.28\textwidth}   %28 min
+\begin{subfigure}[h]{0.30\textwidth}   %28 min
 \begin{grammar}%\centering
   <bsearch> $\rightarrow$ l.2 <while.3> l.18
 
@@ -62,54 +62,8 @@ def bsearch(x, v, n):
   <if.12> $\rightarrow$ l.13
     \alt l.15
 \end{grammar}
+\end{subfigure}
 \vspace{10pt}
-\end{subfigure}
-\hspace{-30pt}
-\begin{subfigure}[h]{0.02\textwidth}
-\begin{tikzpicture}[auto,
-  node distance = 2mm,
-  start chain = going below,
-  start/.style = {ellipse,draw,text width= 3em,rounded corners,blur shadow,fill=white,
-  on chain,align=center},
-  box/.style = {draw,rounded corners,blur shadow,fill=white,
-  on chain,align=center},
-  cond/.style = {diamond,aspect=1,draw,rounded corners,blur shadow,fill=white,
-  on chain,align=center},
-  n/.style = {draw=none, on chain,align=center}]
-  stop/.style = {circle,minimum width=20pt,draw,blur shadow,fill=white, on chain,align=center}]
- \node[n] (l1)    {\nonterm{bsearch}};
- \node[n, below left=2mm and 2mm of l1] (l2)    {l.2};
- \node[n, right=2mm of l2] (l3) {\nonterm{while.3}};
- \node[n, right=2mm of l3] (l18) {l.18};
- \node[n, below left=2mm and 2mm of l3] (l4) {l.4};
- \node[n, below=2mm of l3] (l5) {\nonterm{if.5}};
- \node[n, below left=2mm and 2mm of l5] (l6) {l.6};
- \node[n, below=2mm of l5] (l7) {l.7};
- \node[n, below right=2mm and 2mm of l5] (l8) {\nonterm{if.8}};
- \node[n, below left=2mm and 2mm of l8] (l11) {l.11};
- \node[n, below=2mm of l8] (l12) {\nonterm{if.12}};
- \node[n, below=2mm of l12] (l15) {l.15};
- 
-\draw [arrow] (l1) -- (l2);
-\draw [arrow] (l1) -- (l3);
-\draw [arrow] (l1) -- (l18);
-\draw [arrow] (l3) -- (l4);
-\draw [arrow] (l3) -- (l5);
-\draw [arrow] (l5) -- (l6);
-\draw [arrow] (l5) -- (l7);
-\draw [arrow] (l5) -- (l8);
-\draw [arrow] (l8) -- (l11);
-\draw [arrow] (l8) -- (l12);
-\draw [arrow] (l12) -- (l15);
- %\begin{scope}[rounded corners,-latex]
- % \path (b2.-40) edge[bend left=50] (b4.40)
- % (b1) edge (b2)
- % (b2) edge (b3);
- % \draw (b3.200) -- ++(0,0) -| ([xshift=-5mm]b2.west) |-
- % ([yshift=3mm]b2.130) -- (b2.130);
- %\end{scope}
-\end{tikzpicture}
-\end{subfigure}
-\caption{\<bsearch> source, execution grammar, and an execution tree for \<bsearch(1, [1], 1)>}
+\caption{Extracting the context-free grammar for \<bsearch>}
 \label{fig:bsearch}
 \end{figure*}
