@@ -41,8 +41,7 @@ colorlinks=true,linkcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue
 \tikzstyle{process} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, inner sep=5pt,minimum size=10pt]
 \tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30]
 \tikzstyle{arrow} = [thick,->,>=stealth]
-\usepackage{tikz-uml}
-\usepackage{pgfgantt}
+
 \usepackage{cleveref}
 \usepackage{subcaption}
 
@@ -59,6 +58,11 @@ colorlinks=true,linkcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue
 %\usepackage[capitalise]{cleveref}
 \usepackage{bm}
 \usepackage{syntax}
+%% Identifiers
+\def\|#1|{\textit{#1}}
+\def\<#1>{\texttt{#1}}
+\def\[[#1\]]{\texttt{#1}}
+
 \def\term#1{\texttt{'\textbf{#1}'}}
 \def\nonterm#1{\textnormal{\emph{#1}}}
 \def\regex#1{\texttt{{\color{blue}/}#1{\color{blue}/}}}
