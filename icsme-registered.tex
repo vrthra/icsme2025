@@ -408,7 +408,7 @@ fault localization techniques, program repair techniques, and so on.
 \begin{grammar}\centering
     <s> $\rightarrow$ <C> <IF> \phantom{a}
     
-    <IF> $\rightarrow$ `T' <A> | `F' <B>
+    <IF> $\rightarrow$ \term{T} <A> | \term{F} <B>
 \end{grammar}
 %\begin{grammar}\centering
 %  <s> $\rightarrow$ <C> <IF>
@@ -421,7 +421,7 @@ fault localization techniques, program repair techniques, and so on.
 \begin{grammar}\centering
   <s> $\rightarrow$ <L>\phantom{d a b c d}
   
-  <L> $\rightarrow$ <C> `T' <L> | <C> `F'
+  <L> $\rightarrow$ <C> \term{T} <L> | <C> \term{F}
   %<L> $\rightarrow$ $\epsilon$\phantom{d a b c d f g}
   
 \end{grammar}
@@ -645,7 +645,50 @@ These limitations highlight the need for more robust, scalable, and accurate met
 % --- End Estimation
 % --- Methodology
 \section{Methodology} \label{sec:method}
-\input{bsearch.tex}
+\begin{figure*} %{r}{7cm} %[12]
+  \centering
+\begin{subfigure}[h]{0.45\textwidth} %22 min
+  \centering
+%\begin{subfigure}
+\lstset{numbers=left,xleftmargin=2em, numberstyle=\color{lightgray}
+} %frame=single,framexleftmargin=1.5em}
+\begin{lstlisting}[style=Python, escapechar=|,numbersep=2pt]
+def bsearch(x, v, n):
+  low, high = 0, n-1
+  while low <= high:
+    mid=(low+high)/2
+    if x < v[mid]:
+      high=mid-1
+    else:
+      if x > v[mid]:
+        low=mid+1
+      else:
+        return mid
+  return None
+\end{lstlisting}
+\caption{Original \<bsearch> program}
+\label{fig:bsearch1}
+\end{subfigure}
+\begin{subfigure}[h]{0.45\textwidth}   %28 min
+  \centering
+\begin{grammar}%\centering
+  <bsearch> $\rightarrow$ \term{l.2} <while.3> \term{l.12}
+
+  <while.3> $\rightarrow$ \term{l.3}
+   \alt \term{l.3} \term{l.4} \term{l.5} <if.5> <while.3>
+
+  <if.5>  $\rightarrow$  \term{T} \term{l.6}
+   \alt \term{F} \term{l.8} <if.8>
+
+  <if.8> $\rightarrow$ \term{T} \term{l.9}
+   \alt \term{F} \term{l.11}
+\end{grammar}
+\caption{\<bsearch> control-flow grammar}
+\label{fig:bsearch3}
+\end{subfigure}
+\caption{Extracting the context-free grammar for \<bsearch>}
+\label{fig:bsearch}
+\end{figure*}
 We next describe our proposed methodology for overcoming the limitations discussed in \Cref{sec:reachability}.
 \subsection{Evaluating Estimators of \texorpdfstring{$\hat{S}$}{S-hat} Against Accurate Ground Truth}
 To overcome the problem due to non-availability of complex programs with available
