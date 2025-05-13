@@ -166,7 +166,7 @@ rahul.gopinath@sydney.edu.au}
 Fuzzers are often guided by coverage, making the estimation of maximum
 possible coverage a key concern in fuzzing.
 However, achieving 100\% coverage is impossible for most real-world
-software systems, regardless of the time spent fuzzing.
+software systems, regardless of effort expended.
 While static analysis of reachability can provide an upper bound,
 it is often highly inaccurate.
 Recently, statistical estimation based on species richness estimators
@@ -175,17 +175,14 @@ However, a lack of reliable benchmarks with labeled ground truth has
 limited a thorough evaluation of the accuracy of this approach.
 
 To address this challenge, we propose an evaluation framework
-that generates complex programs with real-world control flow synthetically
-where 100\% reachability is assured, providing the
+that generates complex programs with large and complex control flows
+synthetically where 100\% reachability is assured, providing the
 ground-truth for evaluation.
-Secondly, we propose a novel check for the reliability of estimators---by
-varying the size of sampling units which, under theory should not impact
-the estimation.
+Secondly, we propose a novel check for the reliability of reachability
+estimators using real-world benchmarks, but without using labeled ground
+truth---by varying the size of sampling units, which, under theory
+should not impact the estimation.
 
-Using these benchmarks, we propose to empirically evaluate various
-species richness estimators under different sampling units.
-We aim to identify which estimators demonstrate the highest accuracy against
-known ground truth and consistency across sampling units.
 Our work will identify the most reliable approaches to estimating maximum
 possible coverage in real-world fuzzing campaigns.
 \end{abstract}
@@ -193,28 +190,29 @@ possible coverage in real-world fuzzing campaigns.
 
 \section{Introduction}
 Fuzzing is an automated testing technique that leverages guidance provided
-by coverage. The budget allocated to fuzzing, and hence, the stopping criteria
+by coverage~\cite{boehme2016coverage}.
+The budget allocated to fuzzing, and hence, the stopping criteria
 of fuzzing is strongly determined by the maximum possible coverage that can
 be obtained~\cite{fell2017review}.
-
+%
 However, achieving 100\% coverage in software testing is an impossible goal for
 complex real-world programs~\cite{horgan1994achieving}.
 This is due to the increase in input domain and the corresponding
 increase in execution spaces, which makes exhaustive testing
 impossible~\cite{knight1996exhaustive}.
 
-Yet, quantifying the maximum possible coverage (also called \emph{maximum reachability})
+Yet, quantifying the maximum reachable coverage (also called \emph{maximum reachability})
 remains a challenge, which raises a fundamental question:
 \emph{How close is a fuzzing campaign to achieving its maximum reachable coverage?}
 
 Recent researches have proposed \emph{species richness estimators} from
 biostatistics~\cite{chao2016species} as a principled approach to estimate
-the reachable coverage of a fuzzing campaign~\cite{stads}.
+the reachable coverage of a fuzzing campaign~\cite{boehme2018stads}.
 These estimators treat fuzzing as a statistical sampling process in which
 each test input belongs to one or more program execution behaviors,
 for example, reaching a program element, which can then be leveraged to
-estimate the total possible number of such behaviours such as the total
-possible reachable elements in a program~\cite{stads}.
+estimate the total possible number of such behaviors such as the total
+possible reachable elements in a program~\cite{boehme2018stads}.
 % (e.g., a branch, path, function, or bug).
 
 % Under this analogy, statistical estimators such as Chao2 \cite{chao2017thirty} have been explored to approximate total reachable coverage from partially observed data.
@@ -224,9 +222,7 @@ However, evaluating the accuracy and reliability
 of these estimators is difficult. The main issue is that, to evaluate such
 estimators, we need a benchmark of several large complex programs where
 maximum reachability is known. Unfortunately, establishing the maximum
-reachability is impossible except for trivial programs. Hence,
-rearchers have resorted to using small
-programs, fuzzed to saturation as an alternative~\cite{reachability_2023}.
+reachability is impossible except for trivial programs. Hence, researchers have resorted to using small programs, fuzzed to saturation as an alternative~\cite{liyanage2023reachable}.
 % Using this approach, they have further shown that the reliability of such
 % estimators increase when the number of singletons (those elements that
 % are reached by a single)
@@ -238,11 +234,11 @@ We propose an alternative approach to overcome this difficulty. We note that
 in programs such as parsers (which are one of the major subjects for fuzzing)
 the control-flow of a program along with its data-flow determines the
 complexity of the program, and hence, determines the difficulty
-experienced in reaching the program elements. we also note that the
-control-flow of any structured program can be represented as a context-free
-grammar~\Cref{fig:cfg}.
+experienced in reaching the program elements. The control-flow of any
+structured program can be represented as a context-free
+grammar~(see for e.g., \Cref{fig:cfg}).
 
-The interesting fact here is that it is possible to generate arbitrary
+We note that it is possible to generate arbitrary
 context-free grammars. Furthermore, one can also fine-tune the complexity
 of such grammars generated based on several dimensions such as the size
 of the grammar, the number of direct and indirect recursions allowed, the
@@ -250,11 +246,11 @@ number of linear-recursive rules etc.
 % , the general size of the language
 % corresponding to the universe of all strings, and finally the VC-dimension
 % of the language.
-We further note that converting a context-free grammar to recursive descent
+Finally, converting a context-free grammar to recursive descent
 parsers is well known, and produces parsers which have similarly complex
 control-flows.
 
-Our proposal is then to leverage such arbitrary generated complex
+Our proposal is then to leverage such arbitrarily generated complex
 context-free grammars into parsers, and use such parsers as benchmarks for
 estimating the reliability of reachability estimators. We propose to compare
 the difficulty of fuzzers when faced with real-world parsers to these
@@ -401,10 +397,10 @@ fault localization techniques, program repair techniques, and so on.
 While synthetic benchmarks are a useful alternative, is it possible to use
 real-world programs even if ground-truth (the maximum reachability) is not
 known? A recent research on evaluating the reliability of biostatistics based
-estimators for mutation analysis~\cite{kuznetsov2024empirical} provides a
+estimators for mutation analysis~\cite{Kuznetsov2024empirical} provides a
 solution. The researchers point out that the \emph{sampling units} used in
 species richness estimators should not have a significant effect on the final
-estimate. In previous research on coverage estimation~\cite{reachability_2023},
+estimate. In previous research on coverage estimation~\cite{liyanage2023reachable},
 the sampling-unit used is the time interval. That is, the incidence data of
 each 15-minutes bin was used as the sampling unit. Since the 15-minute interval
 is arbitrary, it stands to reason that changing the timing granularity should
@@ -435,34 +431,26 @@ programs, and use this to evaluate maximum reachability estimators.
 %\item\textcolor{red}{In this paper we propose a solution to the question of how to interpret the estimate from Chao on time based samples.}
 \end{itemize}
 
-The remainder of this paper is organized as follows. Section~\ref{sec:model} introduces the probabilistic model underlying fuzzing and the assumptions made in statistical reachability estimation. Section~\ref{sec:reachability} discusses current approaches to reachability estimation in fuzzing, including existing methods, their associated challenges, proposed solutions, and known drawbacks. Section~\ref{sec:method} presents our methodology for assessing the reliability of statistical estimators of maximum reachability. Section~\ref{sec:setup} details the experimental setup used to evaluate our approach. Finally, Section~\ref{sec:conclusion} concludes the paper and outlines directions for future research.
+The remainder of this paper is organized as follows. Section~\ref{sec:model} introduces the probabilistic model underlying fuzzing and the assumptions made in statistical reachability estimation. Section~\ref{sec:reachability} discusses current approaches to reachability estimation in fuzzing. Section~\ref{sec:method} presents our methodology for assessing the reliability of statistical estimators of maximum reachability. Section~\ref{sec:setup} details the experimental setup used to evaluate our approach. Finally, Section~\ref{sec:conclusion} concludes the paper and outlines directions for future research.
 
 % ---- Model
 \section{Preliminaries} \label{sec:model}
 
 \subsection{Probabilistic Model for Fuzzing}
 
-The STADS framework~\cite{stads,residual2021,bedivfuzz,entropic} formalizes
-fuzzing as a statistical sampling process,
-%We adopt this statistical perspective from STADS \cite{stads,residual2021,bedivfuzz,entropic}, 
-where fuzzing is modeled as a sampling process $\mathcal{F}$,
-in which test inputs are drawn with replacement from the
-program input space $\pmb{\mathcal{D}}$.
-Formally, $\mathcal{F}$ is defined as a sequence of $N$ independent and identically distributed (i.i.d.) random variables:
+The STADS\footnote{STADS—Software Testing As Discovery of Species} framework~\cite{boehme2018stads,boehme2021residual,nguyen2022bedivfuzz,boehme2020boosting} formalizes
+fuzzing as a statistical sampling process $\mathcal{F}$. Each test input is drawn with replacement from the program's input space $\pmb{\mathcal{D}}$. Assuming a sequence of $N$ independent and identically distributed (i.i.d.) random variables are drawn, we formally define the fuzzing campaign $\mathcal{F}$ as:
 
 \begin{equation*}
     \mathcal{F}=\{X_n \mid X_n \in \pmb{\mathcal{D}}\}_{n=1}^N
 \end{equation*}
 
-The STADS framework partitions the input space $\pmb{\mathcal{D}}$ into $S$ overlapping subdomains
-$\{\mathcal{D}_i\}_{i=1}^S$, where each subdomain corresponds to a \emph{coverage element}. An input $X_n \in \mathcal{F}$ is said to cover a \emph{new} coverage element $\mathcal{D}_i$ if $X_n \in \mathcal{D}_i$ and no previously sampled input $X_m \in \mathcal{F}$ (for $m < n$) belongs to $\mathcal{D}_i$, meaning $\mathcal{D}_i$ is sampled for the first time.
+The input space $\pmb{\mathcal{D}}$ consists of $S$ (potentially overlapping) subdomains $\{\mathcal{D}_i\}_{i=1}^S$, each representing a distinct \emph{coverage element}. An input $X_n \in \mathcal{F}$ is said to discover a \emph{new} coverage element $\mathcal{D}_i$ if $X_n \in \mathcal{D}_i$ and no earlier input $X_m \in \mathcal{F}$ for $m < n$ has been drawn from $\mathcal{D}_i$—that is, $\mathcal{D}_i$ is being encountered for the first time.
+
 
 \subsection{Bernoulli Product Model}
-Since each input in fuzzing can cover \emph{one or more coverage elements},
-STADS records coverage information as \emph{sampling unit-based incidence data}~\cite{colwell2012models,Chao_etal:2017}, where a sampling-unit is an aggregation of inputs during a fixed interval of time.
-This is then modeled using the Bernoulli Product model.
-This approach of grouping data into sampling-units is necessary to avoid having
-to record detailed records for each input during fuzzing.
+Since each input in $\mathcal{F}$ may belong to one or more coverage elements, the STADS model represents coverage using \emph{sampling-unit-based incidence data}~\cite{colwell2012models,chao2017thirty}, where a sampling unit aggregates all inputs generated within a fixed time interval. The underlying probabilistic model for this representation is the \emph{Bernoulli product model}. Grouping inputs into sampling units is essential to reduce the overhead of tracking fine-grained coverage information for each individual input during fuzzing.
+
 %This approach eliminates the need to record data for every individual test input in a fuzzing process that generates thousands of inputs per second. Instead, multiple inputs can be grouped into a \emph{sampling unit}.
 
 For each sampling unit, the collected data indicates whether a coverage element
@@ -501,30 +489,99 @@ Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ i
 %\subsection{Probabilistic Model for Sampling-Unit-Based Data} \label{sec:probmodel}
 %
 %Assuming that the fuzzer's search space contains $S$ species, indexed by ${1,2,\dots,S}$. Without loss of generality, assume we have sampled $t$ sampling units, indexed by $1,2,\dots,t$, where each sampling unit represents a set of test inputs generated during a certain period of the ongoing fuzzing campaign. A species could be any choice of a program behaviour such as bugs or coverage elements like program paths, branches, or functions. It is assumed that these sampling units are randomly and independently sampled.
+
+\subsection{Reachability Estimators}
+
+The class of estimators that have been developed to estimate the total number of colors in an urn full of colored balls (cf. \autoref{fig:urn}) and those for the Bernoulli Product model is called \emph{species richness estimators}.
+%
+\autoref{tab:estimators} shows seven (7) \emph{state-of-the-art} \cite{survey1,survey2,survey3} species richness estimators defined for the Bernoulli Product model \cite{boehme2018stads}.
+All listed species richness estimators are \emph{non-parametric}. This means, they can be used for any type of coverage criterion (statement, branch, MCDC, mutation coverage, etc.), for any fuzzer, and for any program irrespective of the underlying distribution $\{p_i\}_{i=1}^S$. We do not consider parametric estimators that assume specific distributions \cite{dorazio2003}. All estimators shown in \autoref{tab:estimators} are also made available via the \texttt{Spade} R package which implements the state-of-the-art in species richness estimation \cite{spade}.
+
+\textbf{Chao-type estimators.} In 1984, Anne Chao suggested that it is unreasonable to provide a point estimate of the total number of species $S=S(n)+f_0(n)$. In applied statistics, the sample coverage $C(n)$ is a property of a sample that quantifies the probability that the next sampled individual ($n+1$) belongs to a species that is already present in the sample. Chao's position is that the complement of the sample coverage (i.e., the discovery probability $1-C(n)$ \cite{boehme2021residual}) is always non-zero, and that we can always add arbitrarily many species $f_0$ into this "missing" probability mass. Instead, Chao proposed an estimator of a \emph{lower bound} on $S$ \cite{chao}, which for the Bernoulli Product model is called the \emph{Chao2} estimator. It can be theoretically shown that \emph{Chao2} performs best for the uniform distribution where species are equally likely. In addition to \emph{Chao2}, we also evaluate a \emph{bias-corrected} variant which tackles systematic bias (\emph{Chao2-bc} \cite{chao_bc}) plus an \emph{improved} variant which also uses $f_3$ and $f_4$ (\emph{iChao2} \cite{chiu2014}).
+
+\textbf{Intuition}. From \autoref{tab:estimators}, we can easily see that all estimators are functions of the number of rare species (e.g., singletons $f_1$ and doubletons $f_2$). The underpinning insight is that the number of rare \emph{and discovered} species ($f_1$ through $f_k$) are excellent predictors of even rarer \emph{and undiscovered} species $f_0$. Rare species simply carry most information about unseen species \cite{incidenceSurvey}.
+
+
+
+\begin{figure}
+  %\resizebox{\linewidth}{!}{
+  \centering\footnotesize
+  \def\arraystretch{1.9}
+  \begin{tabular}{@{}p{1.2cm}@{ }|@{ }p{0.8\columnwidth}}
+      \textbf{Estimator} & \textbf{Description and Formula}\\ [0.5ex]
+      \hline
+      \emph{Chao2} \cite{chao2} & \emph{Chao estimator (1984)}\newline
+      $\hat S_{Chao2}  =
+          \begin{cases}
+              S(n) + \frac{(n-1)}{n}\frac{f_1(n)^2}{2f_2(n)} &     \text{if $f_2(n) > 0$}\\
+              S(n) + \frac{(n-1)}{n}f_1(n)\frac{f_1(n) - 1}{2}  &       \text{if $f_2(n) = 0$}
+          \end{cases}$ \\
+      \hline
+      \emph{Chao2-bc} \cite{chao_bc}& \emph{Bias corrected Chao estimator (2005)}\newline
+      $ \hat S_{Chao2(bc)} = S(n) + f_1(n)\left[ \frac{f_1(n)-1}{2\left(f_2(n)+1\right)}\right]$ \\
+      \hline
+      \emph{iChao2} \cite{chiu2014}& \emph{Improved Chao estimator (2014)}\newline
+      $ \hat S_{iChao2}  = \hat S_{Chao2} \newline \textcolor{white}{.}\quad\quad
+              + \frac{(n-3)}{n}\frac{f_3(n)}{4f_4(n)} \cdot \max\left(f_1(n) -\frac{n - 3}{n-1}\frac{f_2(n)f_3(n)}{2f_4(n)},0\right)$\\
+      \hline
+      ICE \cite{lee1994} & \emph{Incidence-based coverage estimator (1994)}\newline
+      $\hat S_{ICE} = S(n)_{\text{\emph{freq}}} + \frac{S(n)_{\text{\emph{infr}}}}{\hat C(n)_{\text{\emph{ICE}}}}\hat \gamma^2$\newline
+      where\newline
+      $\hat \gamma^2 = \max \left(\frac{S(n)_{\text{\emph{infr}}}}{\hat C(n)_{\text{\emph{ICE}}}}\frac{n_{\text{\emph{infr}}}}{-1+n_{\text{\emph{infr}}}}\frac{\sum_{i=1}^{k}i (i-1)f_i(n)}{\left(n_\text{\emph{infr}}\right)^2}-1,0 \right)$\newline
+      $S(n)_{\text{\emph{infr}}} = \sum_{i=1}^{k}f_i(n)$,\quad
+      $S(n)_{\text{\emph{freq}}} = S(n) - S(n)_{\text{\emph{infr}}}$,\newline
+      $n_\text{\emph{infr}} = \sum_{i=1}^ki f_i(n)$,\quad
+      $\hat C(n)_{\text{\emph{ICE}}} = 1-f_1(n)/n_\text{\emph{infr}}$,\newline
+      $k$ is a constant (often, $k=10$), and\newline
+      \emph{infr} or \emph{freq} denote "rare" and "frequent" species categories.\\
+      %\newline \newline \text{for arbitrary threshold k,} \newline \text{\# infrequent species}  \quad  \newline \text{\# frequent species} \quad S(n)_{\text{\emph{freq}}} = \sum_{i>k}f_i(n) = S(n) - S(n)_{\text{\emph{infreq}}} \newline \text{sample coverage} \quad \hat C_{\text{\emph{infreq}}} = 1-f_1(n)\slash n \newline T_{\text{\emph{infreq}}} \quad \text{is the \# of inputs that belong to atleast one infrequent species}$\\
+      \hline
+      ICE-1 \cite{gotelli2013} & \emph{Modified incidence-based coverage estimator (2013)}\newline
+      $\hat S_{ICE-1} = S(n)_{\text{\emph{freq}}} + \frac{S(n)_{\text{\emph{infr}}}}{\hat C(n)_{\text{\emph{ICE}}}} \bm{\hat{\tilde \gamma}}^2_{\text{\emph{infr}}}$ \newline
+      where\newline
+      $\bm{\hat{\tilde \gamma}}^2_{\text{\emph{infr}}} = \max \left(\hat \gamma^2_{\text{\emph{infr}}} \left(\frac{1+n\left(1 - \hat C(n)_{\text{\emph{ICE}}}\right)\sum_{i=1}^{k}i(i-1)f_i(n)}{n\left(n-1\right) \hat C(n)_{\text{\emph{ICE}}}} \right), 0 \right)$\\
+      \hline
+      JK1 \cite{burnham1978}& \emph{First-order Jackknife estimator (1978)}\newline
+      $\hat S_{jk1}  = S(n) + \frac{n-1}{n}f_1(n) \approx S(n) + f_1(n)$ \\
+      \hline
+      JK2 \cite{burnham1978}& \emph{Second-order Jackknife estimator (1978)}\newline
+      $\hat S_{jk2} = S(n) + \frac{2n-3}{n}f1(n) - \frac{(n-2)^2}{n(n-1)}f_2(n) \newline \textcolor{white}{.}\quad\ \ \,
+          \approx S(n) + 2f_1(n) - f_2(n)$\\
+      \hline
+  \end{tabular}
+  %}
+  \caption{State-of-the-art species richness estimators under the Bernoulli-product model \cite{spade,incidenceSurvey}.}
+  \label{tab:estimators}
+\end{figure}
+
+\textbf{Incidence-based coverage estimators (ICE)} extend this idea of the improved Chao estimator \emph{iChao} to consider more than just singletons and doubletons and integrate the recent understanding of sample coverage $C(n)$. When the individuals are independently sampled from an invariant species distribution, the complement of the missing mass probability given by {Good-Turing estimator} \cite{good1953} (i.e. $\hat C = 1-f_1/n$) provides a highly accurate estimate of the current sample coverage. By incorporating sample coverage, the \emph{incidence-based coverage estimator} (ICE) was derived \cite{lee1994}. It assumes that any species distribution $\left\{p\right\}_{i=1}^S$ can be fully characterized by the coefficient of variation $\gamma^2$ and the mean incidence probability $1/S$ \cite{chao2014species}. Under ICE, species are distinguished, using an arbitrary threshold $k$, as ``frequent'' and ``rare'' (i.e., infrequent) species. Using this distinction, we can obtain an accurate estimate of $\gamma^2$ using only the rare species category. However, the ICE estimator is known to underestimate for highly heterogeneous distribution with very high species richness; like the ones we encounter in fuzzing. A modified version, ICE-1 \cite{gotelli2013} is derived through standard statistical approximations for such \emph{mega-diverse} communities; but with the same set of factors as ICE. For the modified ICE (\emph{ICE-1}), the coefficient of variation $\bm{\hat{\tilde \gamma}}^2$ is estimated as a factor of the coefficient of variation $\hat \gamma^2$ for the original ICE.
+
+\textbf{Jackknife (JK) estimators} for species richness are instances of the general Jackknife method, which uses resampling to estimate certain statistical parameters and to reduce bias. The $j^\text{th}$-order Jackknife estimate (JK-j) is obtained by excluding $j$ sample points from the original sample of size $n$. For instance, the first-order Jackknife $JK1$ of species richness \cite{burnham1978} uses the Good-Turing estimator $1-\widehat{C}(n)=f_1(n)/n$ of the probability of discovering (single) new species. \emph{Assuming} this probability be equivalent for the reduced sample with $n-1$ sampling units, the expected number of undiscovered species $f_0$ is approximate $(n-1)f_1/n$.
+
 % ---- End Model
 % --- Estimation
 \section{Reachability Estimation in Fuzzing}
 \label{sec:reachability}
 
-%With the introduction of the STADS statistical framework and the growing adoption of fuzzing, understanding a fuzzer's detection capacity has become increasingly important. As a result, statistical techniques for estimating maximum reachability $\hat{S}$ have gained prominence \cite{stads,reachability_2023,roadmap}. Most estimators of $\hat{S}$ that conform to the probabilistic model in \autoref{sec:model} are introduced to fuzzing from the well-established field of ecological bio-statistics. However, challenges affecting the accuracy and precision of these estimates have been discussed both in the original STADS framework \cite{stads} and in more recent evaluations \cite{reachability_2023} of estimator performance. We discuss two critical challenges in more detail that we believe have a significant impact on reachability estimation and its evaluation in fuzzing.
+%With the introduction of the STADS statistical framework and the growing adoption of fuzzing, understanding a fuzzer's detection capacity has become increasingly important. As a result, statistical techniques for estimating maximum reachability $\hat{S}$ have gained prominence \cite{boehme2018stads,liyanage2023reachable,boehme2019assurances}. Most estimators of $\hat{S}$ that conform to the probabilistic model in \autoref{sec:model} are introduced to fuzzing from the well-established field of ecological bio-statistics. However, challenges affecting the accuracy and precision of these estimates have been discussed both in the original STADS framework \cite{boehme2018stads} and in more recent evaluations \cite{liyanage2023reachable} of estimator performance. We discuss two critical challenges in more detail that we believe have a significant impact on reachability estimation and its evaluation in fuzzing.
 
 \subsection{Adaptive bias}
-A key statistical challenge in greybox fuzzing is \emph{adaptive bias}: as coverage-increasing inputs are added as new seeds, the distribution $\pi_i$ for $i: 1 \leq i \leq S$ evolves throughout the fuzzing campaign \cite{doctoral_2021}. A fundamental assumption of the Bernoulli Product model—common in statistics and machine learning—is that samples are independent and identically distributed (\emph{iid}), meaning the distribution of detection probabilities remains unchanged over time.  
+A key statistical challenge in greybox fuzzing is \emph{adaptive bias}: as coverage-increasing inputs are added as new seeds, the distribution $\pi_i$ for $i: 1 \leq i \leq S$ evolves throughout the fuzzing campaign \cite{liyanage2021security}. A fundamental assumption of the Bernoulli Product model—common in statistics and machine learning—is that samples are independent and identically distributed (\emph{iid}), meaning the distribution of detection probabilities remains unchanged over time.  
 
-This assumption holds in blackbox fuzzing campaigns where no new seeds are added to the seed corpus while the fuzzer is running. However, in greybox fuzzing, which is the predominant fuzzing technique today, the outcome of one sample influences subsequent samples, violating the independence assumption \cite{entropic,stads,doctoral_2021}. Consequently, applying existing statistical estimators to greybox fuzzing leads to \emph{adaptive bias}, where estimates systematically over- or under-estimate the true value in greybox campaigns.
+This assumption holds in blackbox fuzzing campaigns where no new seeds are added to the seed corpus while the fuzzer is running. However, in greybox fuzzing, which is the predominant fuzzing technique today, the outcome of one sample influences subsequent samples, violating the independence assumption \cite{boehme2020boosting,boehme2018stads,liyanage2021security}. Consequently, applying existing statistical estimators to greybox fuzzing leads to \emph{adaptive bias}, where estimates systematically over- or under-estimate the true value in greybox campaigns.
 
-Therefore, developing novel estimation strategies that correct adaptive bias in statistical estimation of key performance parameters is crucial for assessing greybox fuzzing progress and predicting its future trajectory. Recent advancements have introduced techniques that mitigate adaptive bias to estimate \emph{residual risk} \cite{residual2021} and to extrapolate \emph{coverage rate} \cite{coveragerate2024} in greybox fuzzing. However, state-of-the-art reachability estimators continue to be affected by adaptive bias.
+Therefore, developing novel estimation strategies that correct adaptive bias in statistical estimation of key performance parameters is crucial for assessing greybox fuzzing progress and predicting its future trajectory. Recent advancements have introduced techniques that mitigate adaptive bias to estimate \emph{residual risk} \cite{boehme2021residual} and to extrapolate \emph{coverage rate} \cite{liyanage2024extrapolating} in greybox fuzzing. However, state-of-the-art reachability estimators continue to be affected by adaptive bias.
 
 
 \subsection{Challenge of Establishing Ground Truth for Evaluation}
 
-As with other software testing techniques, fuzzing aims to progressively explore diverse program behaviors—such as increasing code coverage or triggering distinct faults—over time. However, a fundamental challenge in evaluating the effectiveness of a fuzzing campaign lies in the absence of an absolute ground truth. Specifically, we can never be certain that all reachable program behaviors have been exercised, regardless of how long the fuzzer runs \cite{dijkstra2002ewd}. There always exists a non-zero probability that previously undiscovered behaviors may emerge as new test inputs are generated \cite{residual2021}.
+As with other software testing techniques, fuzzing aims to progressively explore diverse program behaviors—such as increasing code coverage or triggering distinct faults—over time. However, a fundamental challenge in evaluating the effectiveness of a fuzzing campaign lies in the absence of an absolute ground truth. Specifically, we can never be certain that all reachable program behaviors have been exercised, regardless of how long the fuzzer runs \cite{dijkstra2002ewd}. There always exists a non-zero probability that previously undiscovered behaviors may emerge as new test inputs are generated \cite{boehme2021residual}.
 
 Despite this inherent uncertainty, the effectiveness of a fuzzing approach is often evaluated based on its maximum observed reachability within a fixed time or resource budget. For example, widely used benchmarks such as Fuzzbench \cite{metzman2021fuzzbench} and Magma \cite{hazimeh2020magma} assess fuzzers by measuring the coverage achieved after executing for a predetermined duration (e.g., 24 hours in the case of Fuzzbench). However, such evaluations can be misleading in scenarios where novel program behaviors are discovered beyond the allotted time window. This limitation underscores the need for more conclusive and robust quantitative techniques to assess fuzzing effectiveness—particularly methods grounded in data-driven estimation of maximum reachability. Still, establishing the ground truth remains a cornerstone for reliably evaluating such quantitative reachability measures.
 
 \subsection{Existing Methods in Approximating Ground-Truth for Maximum Reachability}
 
-Even though achieving a 100\% guarantee of exhausting all possible program behaviors is inherently unattainable, the longer a fuzzing campaign proceeds without encountering new behaviors, the lower the probability of discovering additional ones becomes. This diminishing discovery rate, in turn, increases our confidence in treating the current state as an empirical approximation of the ground truth for maximum reachability. However, recent empirical evidence based on extensive 7-day AFL++ \cite{aflpp} fuzzing campaigns across 32 real-world C programs demonstrates that reaching a true asymptote in coverage is often elusive in practice \cite{reachability_2023}. While coverage curves may appear to saturate when plotted on a linear scale, this effect is far less discernible on a logarithmic scale—suggesting that new behaviors continue to emerge at a slow but non-negligible rate. This observation further complicates the task of defining and approximating ground truth in fuzzing evaluation. Moreover, the same study highlights the limitations of using static analysis for estimating maximum reachable coverage, revealing both under- and over-approximation in practice. 
+Even though achieving a 100\% guarantee of exhausting all possible program behaviors is inherently unattainable, the longer a fuzzing campaign proceeds without encountering new behaviors, the lower the probability of discovering additional ones becomes. This diminishing discovery rate, in turn, increases our confidence in treating the current state as an empirical approximation of the ground truth for maximum reachability. However, recent empirical evidence based on extensive 7-day AFL++ \cite{fioraldi2020AFL++} fuzzing campaigns across 32 real-world C programs demonstrates that reaching a true asymptote in coverage is often elusive in practice \cite{liyanage2023reachable}. While coverage curves may appear to saturate when plotted on a linear scale, this effect is far less discernible on a logarithmic scale—suggesting that new behaviors continue to emerge at a slow but non-negligible rate. This observation further complicates the task of defining and approximating ground truth in fuzzing evaluation. Moreover, the same study highlights the limitations of using static analysis for estimating maximum reachable coverage, revealing both under- and over-approximation in practice. 
 
 To address this challenge, the current fuzzing literature proposes state-of-the-art strategies to approximate ground-truth reachability, particularly for evaluating statistical estimators of maximum reachability:
 
@@ -585,7 +642,7 @@ previously proposed benchmark, we propose a second criterion that can be applied
 to real-world benchmarks without relying on availability of ground truth.
 
 Our approach is inspired by the previous research on equivalent mutant
-estimation~\cite{kuznetsov2024empirical}, which suggests that varying
+estimation~\cite{Kuznetsov2024empirical}, which suggests that varying
 sample-units can be leveraged to evaluate the reliability of estimators.
 The idea is that, while incidence-based statistical estimators of
 fuzzing effectiveness may be sensitive to the sampling unit size ($r$),
@@ -603,12 +660,12 @@ campaigns with different sampling unit definitions $r$.
 % Prior empirical research on estimating maximum reachable coverage in fuzzing
 % campaigns—under the Bernoulli product model—has shown that statistical
 % estimators systematically underestimate true reachability until near
-% saturation, a phenomenon termed \emph{false peaks}~\cite{reachability_2023}.
+% saturation, a phenomenon termed \emph{false peaks}~\cite{liyanage2023reachable}.
 % This negative bias is largely inevitable in early stages due to the
 % insufficiency of fuzzing data and the heterogeneous species diversity,
 % which limits accurate approximation of the species distribution.
 % 
-% Prior research~\cite{reachability_2023} empirically investigated this
+% Prior research~\cite{liyanage2023reachable} empirically investigated this
 % phenomenon, and suggests that estimators become reliable when the
 % count of doubletons equals or exheeds singletons.
 
@@ -616,7 +673,7 @@ campaigns with different sampling unit definitions $r$.
 % 
 % \result{\textbf{Intuition:} While incidence-based statistical estimators of fuzzing effectiveness are sensitive to the sampling unit size ($r$), a reliable estimator should produce overlapping point estimates for $S$—with varying variance but consistent expectation—when evaluated over equal-length campaigns.}
 % 
-% The incidence frequency counts—particularly singletons ($f_1$) and doubletons ($f_2$)—are sensitive to the granularity of the sampling unit ($r$). Using individual inputs ($r=1$) yields the most fine-grained data, while aggregating inputs (e.g., over time intervals) reduces resolution. Aggregation tends to decrease $f_1$ and increase higher-frequency counts, as rare elements may co-occur within a unit. Since estimators like Chao2 depend directly on $f_1$ and $f_2$, the point estimate of species richness $\hat{S}$ may vary with changes in $r$, even under equal-length campaigns. Despite this sensitivity, the choice of $r$ is often arbitrary; for instance, \cite{reachability_2023} adopts 15-minute intervals without justification.
+% The incidence frequency counts—particularly singletons ($f_1$) and doubletons ($f_2$)—are sensitive to the granularity of the sampling unit ($r$). Using individual inputs ($r=1$) yields the most fine-grained data, while aggregating inputs (e.g., over time intervals) reduces resolution. Aggregation tends to decrease $f_1$ and increase higher-frequency counts, as rare elements may co-occur within a unit. Since estimators like Chao2 depend directly on $f_1$ and $f_2$, the point estimate of species richness $\hat{S}$ may vary with changes in $r$, even under equal-length campaigns. Despite this sensitivity, the choice of $r$ is often arbitrary; for instance, \cite{liyanage2023reachable} adopts 15-minute intervals without justification.
 % 
 % However, since the maximum reachability $S$ is a finite quantity for any given fuzzing campaign, a reliable estimator should approximate it within reasonable error bounds—despite variability in incidence frequencies introduced by changes in the sampling unit definition—provided that the estimation is performed at the same time point since the campaign's start. Leveraging this property, we evaluate whether estimators of maximum reachability $S$ yield consistent point estimates with overlapping confidence intervals, while allowing for differences in estimation accuracy (i.e., variability) across fuzzing campaigns with different sampling unit definitions $r$.
 
@@ -642,26 +699,26 @@ This study addresses the following research questions:
 
 \subsection{Fuzzers and Subject Programs}
 
-For our experiments, we use AFL++ \cite{aflpp}, a widely recognized state-of-the-art greybox fuzzer known for its performance and extensive adoption in recent research, particularly in reachability estimation studies. Using the same fuzzer as prior work enables direct and fair comparisons when evaluating estimator performance (RQ2).
+For our experiments, we use AFL++ \cite{fioraldi2020AFL++}, a widely recognized state-of-the-art greybox fuzzer known for its performance and extensive adoption in recent research, particularly in reachability estimation studies. Using the same fuzzer as prior work enables direct and fair comparisons when evaluating estimator performance (RQ2).
 
-We select a diverse set of real-world C programs from the FuzzBench platform \cite{metzman2021fuzzbench}, which provides a standardized fuzzing benchmarking environment. To ensure comparability with earlier studies (specifically for RQ2), we include all subject programs used in \cite{reachability_2023}, along with several additional targets that are compatible with AFL++ and suitable for large-scale fuzzing.
+We select a diverse set of real-world C programs from the FuzzBench platform \cite{metzman2021fuzzbench}, which provides a standardized fuzzing benchmarking environment. To ensure comparability with earlier studies (specifically for RQ2), we include all subject programs used in \cite{liyanage2023reachable}, along with several additional targets that are compatible with AFL++ and suitable for large-scale fuzzing.
 
 
 \section{Related Work}
 
-Reachable program behaviors (e.g. code coverage and discovered bugs) determine the \emph{effectiveness} of a software testing process. For non-trivial programs, exhaustively exercising all possible behaviors is infeasible. Consequently, testing is often viewed as a means to demonstrate the presence of bugs, but not their absence~\cite{dijkstra2022reliability}. Despite this limitation, substantial effort has been directed toward increasing maximum reachability to enhance software security and reliability. Nevertheless, determining reachability remains a fundamental challenge in software testing. In fact, an efficient and precise determination of reachable code would effectively resolve the software verification problem~\cite{reachability_2023}. 
+Reachable program behaviors (e.g. code coverage and discovered bugs) determine the \emph{effectiveness} of a software testing process. For non-trivial programs, exhaustively exercising all possible behaviors is infeasible. Consequently, testing is often viewed as a means to demonstrate the presence of bugs, but not their absence~\cite{dijkstra2022reliability}. Despite this limitation, substantial effort has been directed toward increasing maximum reachability to enhance software security and reliability. Nevertheless, determining reachability remains a fundamental challenge in software testing. In fact, an efficient and precise determination of reachable code would effectively resolve the software verification problem~\cite{liyanage2023reachable}. 
 
-Efforts to approximate reachability quantitatively have gained traction in the security domain, despite inherent difficulties. Empirical studies indicate that establishing the reachability of certain code regions is particularly challenging in large, complex code bases, using both static and dynamic analysis techniques~\cite{reachability_questions}. Static analysis methods, such as symbolic execution, often suffer from over- or under-approximation when estimating reachable coverage~\cite{reachability_2023,Aniche2015}. For instance, Nikoli\'{c} and Spoto~\cite{reachability_program_vars} proposed approximating the reachability of program variables as a new abstract domain for static analysis. While their approach yields over-approximations, authors argue that it can be conservatively applied to identify unreachable code. Similarly, Mikol\'{a}\v{s} et al.~\cite{annotate_reachability} leveraged annotated code to define unreachability conditions and proposed an efficient algorithm for detecting unreachable code.
+Efforts to approximate reachability quantitatively have gained traction in the security domain, despite inherent difficulties. Empirical studies indicate that establishing the reachability of certain code regions is particularly challenging in large, complex code bases, using both static and dynamic analysis techniques~\cite{latoza2010developers}. Static analysis methods, such as symbolic execution, often suffer from over- or under-approximation when estimating reachable coverage~\cite{liyanage2023reachable,aniche2015why}. For instance, Nikoli\'{c} and Spoto~\cite{nikolic2013reachability} proposed approximating the reachability of program variables as a new abstract domain for static analysis. While their approach yields over-approximations, authors argue that it can be conservatively applied to identify unreachable code. Similarly, Mikol\'{a}\v{s} et al.~\cite{janota2007reachability} leveraged annotated code to define unreachability conditions and proposed an efficient algorithm for detecting unreachable code.
 
-To assess reachability or unreachability in dynamic analysis, both constraint-solving techniques such as SMT\footnote{SMT—Satisfiability Modulo Theory} and data-driven estimation methods have been explored. Naus et al.~\cite{naus2023low} proposed a technique for automatically generating preconditions to trigger specific post-conditions (e.g., bugs) using low-level code analysis. Similarly, Liew et al.~\cite{Liew2019} demonstrated how to encode SMT formulas within coverage-guided fuzzers to discover inputs that reach targeted program locations. In contrast, statistical approaches directly attempt to estimate the test effectiveness (aka maximum reachability) through observed behaviors. The pioneering STADS\footnote{STADS—Software Testing As Discovery of Species} framework~\cite{stads} introduced a suite of bio-statistical estimators by modeling fuzzing as a statistical sampling process. A recent evaluation of these estimators highlighted key challenges associated with reachability estimation~\cite{reachability_2023}. When applied to estimate the number of killable mutants in mutation analysis, Kuznetsov et al.~\cite{killable} empirically demonstrated the unreliability of STADS estimators due to variations in sampling unit definitions. This finding, together with other recent studies, underscores the need for \emph{structure-aware} estimators that incorporate internal program structure, as opposed to structure-agnostic alternatives~\cite{statreachability_2023}.
+To assess reachability or unreachability in dynamic analysis, both constraint-solving techniques such as SMT\footnote{SMT—Satisfiability Modulo Theory} and data-driven estimation methods have been explored. Naus et al.~\cite{naus2023low} proposed a technique for automatically generating preconditions to trigger specific post-conditions (e.g., bugs) using low-level code analysis. Similarly, Liew et al.~\cite{liew2019just} demonstrated how to encode SMT formulas within coverage-guided fuzzers to discover inputs that reach targeted program locations. In contrast, statistical approaches directly attempt to estimate the test effectiveness (aka maximum reachability) through observed behaviors. The pioneering STADS framework~\cite{boehme2018stads} introduced a suite of bio-statistical estimators by modeling fuzzing as a statistical sampling process. A recent evaluation of these estimators highlighted key challenges associated with reachability estimation~\cite{liyanage2023reachable}. When applied to estimate the number of killable mutants in mutation analysis, Kuznetsov et al.~\cite{Kuznetsov2024empirical} empirically demonstrated the unreliability of STADS estimators due to variations in sampling unit definitions. This finding, together with other recent studies, underscores the need for \emph{structure-aware} estimators that incorporate internal program structure, as opposed to structure-agnostic alternatives~\cite{lee2023statistical}.
 
 
 \section{Conclusion}
 \label{sec:conclusion}
 In this report, we propose to assess the reliability of species estimators when
 they are used for estimating reachable coverage. We propose to do that both by
-providing a synthetic benchmark with labelled ground truth, and also by
-using a separate means of checking the reliability of estimators by variying
+providing a synthetic benchmark with labeled ground truth, and also by
+using a separate means of checking the reliability of estimators by varying
 the sampling units used.
 
 %\section{Authors and Affiliations}
