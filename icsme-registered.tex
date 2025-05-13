@@ -40,7 +40,10 @@ colorlinks=true,linkcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue
 %\usepackage[capitalise]{cleveref}
 \usepackage{bm}
 \usepackage{syntax}
-
+\def\term#1{\texttt{'\textbf{#1}'}}
+\def\nonterm#1{\textnormal{\emph{#1}}}
+\def\regex#1{\texttt{{\color{blue}/}#1{\color{blue}/}}}
+\def\expandsto{\(\rightarrow{}\)}
 \usepackage{bbding}
 \DeclareUnicodeCharacter{1F3B2}{\dice}
 
