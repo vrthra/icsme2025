@@ -1,6 +1,7 @@
 \begin{figure*} %{r}{7cm} %[12]
   \centering
-\begin{subfigure}[h]{0.30\textwidth} %22 min
+\begin{subfigure}[h]{0.45\textwidth} %22 min
+  \centering
 %\begin{subfigure}
 \lstset{numbers=left,xleftmargin=2em, numberstyle=\color{lightgray}
 } %frame=single,framexleftmargin=1.5em}
@@ -18,52 +19,26 @@ def bsearch(x, v, n):
         return mid
   return None
 \end{lstlisting}
-\vspace{60pt}
+\caption{Original \<bsearch> program}
+\label{fig:bsearch1}
 \end{subfigure}
-\begin{subfigure}[h]{0.30\textwidth} %25 min
-%\begin{subfigure}
-\lstset{numbers=left,xleftmargin=2em,
-numberstyle=\color{lightgray}
-} %frame=single,framexleftmargin=1.5em}
-\begin{lstlisting}[style=Python, escapechar=|,numbersep=2pt]
-def bsearch(x, v, n):
-  low, high = 0, n-1
-  while True:
-    r1_ = low <= high
-    if r1_:
-      mid = (low+high)/2
-      r2_ = x < v[mid]
-      if r2_:
-        high = mid-1
-      else:
-        r3_ = x > v[mid]
-        if r3_:
-          low = mid+1
-        else:
-          return mid
-    else:
-      break
-  return None
-\end{lstlisting}
-\end{subfigure}
-\begin{subfigure}[h]{0.30\textwidth}   %28 min
+\begin{subfigure}[h]{0.45\textwidth}   %28 min
+  \centering
 \begin{grammar}%\centering
-  <bsearch> $\rightarrow$ l.2 <while.3> l.18
+  <bsearch> $\rightarrow$ l.2 <while.3> l.12
 
-  <while.3> $\rightarrow$ $\epsilon$
-   \alt l.4 <if.5> <while.3>
+  <while.3> $\rightarrow$ l.3
+   \alt l.3 l.4 l.5 <if.5> <while.3>
 
-  <if.5>    $\rightarrow$ l.6 l.7 <if.8>
-   \alt l.17
+  <if.5>  $\rightarrow$  T l.6
+   \alt F l.8 <if.8>
 
-  <if.8> $\rightarrow$ l.9
-   \alt l.11 <if.12>
-
-  <if.12> $\rightarrow$ l.13
-    \alt l.15
+  <if.8> $\rightarrow$ T l.9
+   \alt F l.11
 \end{grammar}
+\caption{\<bsearch> control-flow grammar}
+\label{fig:bsearch3}
 \end{subfigure}
-\vspace{10pt}
 \caption{Extracting the context-free grammar for \<bsearch>}
 \label{fig:bsearch}
 \end{figure*}

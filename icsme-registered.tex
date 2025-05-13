@@ -421,7 +421,7 @@ fault localization techniques, program repair techniques, and so on.
 \begin{grammar}\centering
   <s> $\rightarrow$ <L>\phantom{d a b c d}
   
-  <L> $\rightarrow$ <C> <If> <L> | $\epsilon$
+  <L> $\rightarrow$ <C> `T' <L> | <C> `F'
   %<L> $\rightarrow$ $\epsilon$\phantom{d a b c d f g}
   
 \end{grammar}
@@ -651,11 +651,20 @@ We next describe our proposed methodology for overcoming the limitations discuss
 To overcome the problem due to non-availability of complex programs with available
 maximum coverage, we propose a novel methodology.
 
-We note that any structured program has a fixed control-flow graph composed of
-the following elements. (1) sequence of nodes representing a linear flow of execution (2) branching nodes
-representing conditionals and switch/case statements in code (3) loops that represent iterative statements
-in code and (4) procedure calls. Each of these elements can be represented by
-an element in a non left-recursive context-free grammar. The details are given in \Cref{fig:cfg}.
+We note that any structured program can be translated into a simpler program
+such that it contains only the following elements:
+(1) sequence of statements
+(2) if-then-else conditionals
+(3) loops without conditionals (e.g. \mbox{\<while True: \ldots>})
+(4) procedure calls.
+As an example, we show in \Cref{fig:bsearch} how we translate \<bsearch> (\Cref{fig:bsearch1})
+to this simplified form (\Cref{fig:bsearch2}).
+Next, given such a simplified form and its control-flow,
+we can leverage the following rules to convert the control-flow to the context-free grammar~(\Cref{fig:cfg}).
+That is, (1) for any given loop, 
+
+
+The details are given in \Cref{fig:cfg}.
 Conversely, given any non left-recursive context-free grammar, we can generate a
 recursive-descent parser by using the following rules:
 (1) Any nonterminal symbol is turned into a procedure in the parser.
