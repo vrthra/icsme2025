@@ -709,7 +709,9 @@ it can be translated to an equivalent grammar rule
 %\end{grammar}
 (2) for any conditional \<if C: B else: D>, translate to
   \mbox{\nonterm{IF} \expandsto \nonterm{C} \term{T} \nonterm{B}  $|$ \nonterm{C} \term{F} \nonterm{D}}
-(3) procedure calls translate to their own nonterminal symbols.
+(3) procedure definitions such as \<def P(): B \ldots> translate to a nonterminal symbol with the same
+name: \mbox{\nonterm{P} \expandsto \nonterm{B}}, and sequence of statements are simply captured
+directly with corresponding tokens.
 The details are given in \Cref{fig:cfg}.
 
 Conversely, given any non left-recursive context-free grammar, we can generate a
