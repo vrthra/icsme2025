@@ -41,7 +41,6 @@ colorlinks=true,linkcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue
 \tikzstyle{process} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30, inner sep=5pt,minimum size=10pt]
 \tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30]
 \tikzstyle{arrow} = [thick,->,>=stealth]
-
 \usepackage{cleveref}
 \usepackage{subcaption}
 
@@ -628,6 +627,7 @@ These limitations highlight the need for more robust, scalable, and accurate met
 % --- End Estimation
 % --- Methodology
 \section{Methodology} \label{sec:method}
+\input{bsearch.tex}
 We next describe our proposed methodology for overcoming the limitations discussed in \Cref{sec:reachability}.
 \subsection{Evaluating Estimators of \texorpdfstring{$\hat{S}$}{S-hat} Against Accurate Ground Truth}
 To overcome the problem due to non-availability of complex programs with available
