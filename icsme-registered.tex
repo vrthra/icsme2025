@@ -714,6 +714,15 @@ name: \mbox{\nonterm{P} \expandsto \nonterm{B}}, and sequence of statements are 
 directly with corresponding tokens.
 The details are given in \Cref{fig:cfg}.
 
+Given that \emph{any structured program} can thus be translated into a
+context-free grammar, the space of possible context-free grammars are also
+the space of control-flows of possible programs. Hence, to evaluate how
+an estimator performs on the reachability of all possible programs, it is
+sufficient to generate a statistically significant number of complex
+context-free programs that represent control-flows, and translate them back
+to programs. This raises a question. How can we translate these control-flows
+to equivalent programs with the same control flow.
+
 Conversely, given any non left-recursive context-free grammar, we can generate a
 recursive-descent parser by using the following rules:
 (1) Any nonterminal symbol is turned into a procedure in the parser.
