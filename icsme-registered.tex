@@ -723,9 +723,9 @@ context-free programs that represent control-flows, and translate them back
 to programs. This raises a question. How can we translate these control-flows
 to equivalent programs with the same control flow.
 
-Conversely, given any non left-recursive context-free grammar, we can generate a
-recursive-descent parser by using the following rules:
-(1) Any nonterminal symbol is turned into a procedure in the parser.
+Fortunately, there is an easy naswer. Given any non left-recursive context-free
+grammar, we can generate a recursive-descent parser by using the following rules:
+(1) Any nonterminal symbol in the grammar is turned into a procedure in the parser.
 (2) Each production rule is also turned into a procedure in the parser.
 (3) The particular rule to be used to parse is based on the \emph{lookahead}
 corresponding to each rule that matches the current symbol.
