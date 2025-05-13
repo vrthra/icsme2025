@@ -1,0 +1,55 @@
+\begin{tikzpicture}[auto,
+  node distance = 3mm,
+  start chain = going below,
+  start/.style = {ellipse,draw,text width= 1em,rounded corners,blur shadow,fill=white,
+        on chain,align=center},
+  box/.style = {draw,rounded corners,blur shadow,fill=white,
+        on chain,align=center},
+  cond/.style = {diamond,draw,rounded corners,blur shadow,fill=white,
+        on chain,align=center},
+  stop/.style = {circle,minimum width=20pt,draw,blur shadow,fill=white,
+        on chain,align=center}
+]
+ \node[start] (b1)    {s};
+ \node[cond] (b2)    {C};
+ % \node[box, left=1cm of b2] (b21) {A};
+ % \node[box,right=1cm of b2] (b22)    {B};
+ %\node[box, below left=0.6cm and 1cm of b2] (b21) {A};
+ %\node[box, below right=0.6cm and 1cm of b2] (b22) {B};
+ \node[box, below=0.3cm of b2, xshift=-1.5cm] (b21) {A};
+\node[box, below=0.3cm of b2, xshift=1.5cm] (b22) {B};
+ \node[stop,below=12mm of b2] (b3)    {e};
+
+ \begin{scope}[-{Latex},rounded corners=5pt]
+  \path (b1) -- (b2);
+  \path (b2) -- ++(0,-0.3) coordinate (tempT) -- ++(-1.5,0) node[near start,left] {T} -- (b21);
+  \path (b2) -- ++(0,-0.3) coordinate (tempF) -- ++(1.5,0) node[near start,right] {F} -- (b22);
+  \path (b21) -- (b3);
+  \path (b22) -- (b3);
+\end{scope}
+%\begin{scope}[-{Latex},rounded corners=5pt]
+%  \path (b1) -- (b2);
+%  \path (b2) |- node [near start,left] {T} (b21);
+%  \path (b2) -| node [near start,right] {F} (b22);
+%  \path (b21) -- (b3);
+%  \path (b22) -- (b3);
+%\end{scope}
+
+%  \begin{scope}[-{Latex},rounded corners]
+%   \path (b1) edge (b2);
+%   \path (b2) edge[out=225, in=90] node [midway,left] {T} (b21);
+%   \path (b2) edge[out=315, in=90] node [midway,right] {F} (b22);
+%   \path (b21) edge (b3);
+%   \path (b22) edge (b3);
+% \end{scope}
+ %\begin{scope}[rounded corners,-latex]
+ %\path
+ %(b1) edge (b2);
+ %\path
+ %(b2) edge node [midway,above] {T} (b21);
+ %\path
+ %(b2) edge node [midway,above] {F} (b22)
+ %(b21) edge (b3)
+ %(b22) edge (b3);
+%\end{scope}
+\end{tikzpicture}

@@ -321,7 +321,8 @@ fault localization techniques, program repair techniques, and so on.
  \node[box] (b2)    {A};
  \node[box] (b3)    {B};
  \node[box] (b4)    {C};
- \node[stop] (b5)    {e};
+ \node[stop,below=1mm of b4] (b5)    {e};
+ %\node[stop] (b5)    {e};
  \begin{scope}[rounded corners,-latex]
   \path
   (b1) edge (b2)
@@ -335,7 +336,7 @@ fault localization techniques, program repair techniques, and so on.
 \end{subfigure}
 \begin{subfigure}[h]{0.3\textwidth}
 \centering
-% \vspace{2.8cm}
+
 \begin{tikzpicture}[auto,
   node distance = 3mm,
   start chain = going below,
@@ -350,18 +351,16 @@ fault localization techniques, program repair techniques, and so on.
 ]
  \node[start] (b1)    {s};
  \node[cond] (b2)    {C};
- \node[box, left=1cm of b2] (b21) {A};
- \node[box,right=1cm of b2] (b22)    {B};
- \node[stop,below=5mm of b2] (b3)    {e};
+ \node[box, below left=0.5cm and 0.6cm of b2] (b21) {A};
+ \node[box, below right=0.5cm and 0.6cm of b2] (b22) {B};
+ \node[stop,below=12mm of b2] (b3)    {e};
  \begin{scope}[rounded corners,-latex]
  \path
  (b1) edge (b2);
- \path
- (b2) edge node [midway,above] {T} (b21);
- \path
- (b2) edge node [midway,above] {F} (b22)
- (b21) edge (b3)
- (b22) edge (b3);
+ \draw[-latex] (b2) -| node[pos=0.25,above] {T} (b21);
+ \draw[-latex] (b2) -| node[pos=0.25,above] {F} (b22);
+  \draw[-latex] (b21) |- (b3);
+  \draw[-latex] (b22) |- (b3);
 \end{scope}
 \end{tikzpicture}
 \caption{Condition}
@@ -384,10 +383,11 @@ fault localization techniques, program repair techniques, and so on.
  \node[start] (b1)    {s};      
  \node[cond] (b2)    {C};      
  \node[box] (b3)    {B};  
- \node[stop] (b4)    {e};
+ %\node[stop] (b4)    {e};
+ \node[stop,below=4mm of b3] (b4)    {e};
  \begin{scope}[rounded corners,-latex]
   \path (b2.-40) edge[bend left=50] (b4.40)
-  (b1) edge (b2)
+  (b1) edge node [midway,below, xshift=-12pt,yshift=-25pt] {T}(b2)
   (b2) edge (b3);
   \draw (b3.200) -- ++(0,0) -| ([xshift=-5mm]b2.west) |-
   ([yshift=3mm]b2.130) -- (b2.130);
@@ -406,9 +406,7 @@ fault localization techniques, program repair techniques, and so on.
 \end{subfigure}
 \begin{subfigure}[h]{0.3\textwidth}
 \begin{grammar}\centering
-    <s> $\rightarrow$ <C> <IF> \phantom{a}
-    
-    <IF> $\rightarrow$ \term{T} <A> | \term{F} <B>
+    <s> $\rightarrow$ <C> \term{T} <A> | <C> \term{F} <B>
 \end{grammar}
 %\begin{grammar}\centering
 %  <s> $\rightarrow$ <C> <IF>
@@ -419,9 +417,7 @@ fault localization techniques, program repair techniques, and so on.
 \end{subfigure}
 \begin{subfigure}[h]{0.3\textwidth}
 \begin{grammar}\centering
-  <s> $\rightarrow$ <L>\phantom{d a b c d}
-  
-  <L> $\rightarrow$ <C> \term{T} <L> | <C> \term{F}
+  <s> $\rightarrow$ <C> \term{T} <B> | <C> \term{F}
   %<L> $\rightarrow$ $\epsilon$\phantom{d a b c d f g}
   
 \end{grammar}
@@ -533,87 +529,25 @@ Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ i
 %
 %Assuming that the fuzzer's search space contains $S$ species, indexed by ${1,2,\dots,S}$. Without loss of generality, assume we have sampled $t$ sampling units, indexed by $1,2,\dots,t$, where each sampling unit represents a set of test inputs generated during a certain period of the ongoing fuzzing campaign. A species could be any choice of a program behaviour such as bugs or coverage elements like program paths, branches, or functions. It is assumed that these sampling units are randomly and independently sampled.
 
-\subsection{Reachability Estimators}
-
-The class of estimators that have been developed to estimate the total number of colors in an urn full of colored balls (cf. \autoref{fig:urn}) and those for the Bernoulli Product model is called \emph{species richness estimators}.
-%
-\autoref{tab:estimators} shows seven (7) \emph{state-of-the-art} \cite{survey1,survey2,survey3} species richness estimators defined for the Bernoulli Product model \cite{boehme2018stads}.
-All listed species richness estimators are \emph{non-parametric}. This means, they can be used for any type of coverage criterion (statement, branch, MCDC, mutation coverage, etc.), for any fuzzer, and for any program irrespective of the underlying distribution $\{p_i\}_{i=1}^S$. We do not consider parametric estimators that assume specific distributions \cite{dorazio2003}. All estimators shown in \autoref{tab:estimators} are also made available via the \texttt{Spade} R package which implements the state-of-the-art in species richness estimation \cite{spade}.
-
-\textbf{Chao-type estimators.} In 1984, Anne Chao suggested that it is unreasonable to provide a point estimate of the total number of species $S=S(n)+f_0(n)$. In applied statistics, the sample coverage $C(n)$ is a property of a sample that quantifies the probability that the next sampled individual ($n+1$) belongs to a species that is already present in the sample. Chao's position is that the complement of the sample coverage (i.e., the discovery probability $1-C(n)$ \cite{boehme2021residual}) is always non-zero, and that we can always add arbitrarily many species $f_0$ into this "missing" probability mass. Instead, Chao proposed an estimator of a \emph{lower bound} on $S$ \cite{chao}, which for the Bernoulli Product model is called the \emph{Chao2} estimator. It can be theoretically shown that \emph{Chao2} performs best for the uniform distribution where species are equally likely. In addition to \emph{Chao2}, we also evaluate a \emph{bias-corrected} variant which tackles systematic bias (\emph{Chao2-bc} \cite{chao_bc}) plus an \emph{improved} variant which also uses $f_3$ and $f_4$ (\emph{iChao2} \cite{chiu2014}).
-
-\textbf{Intuition}. From \autoref{tab:estimators}, we can easily see that all estimators are functions of the number of rare species (e.g., singletons $f_1$ and doubletons $f_2$). The underpinning insight is that the number of rare \emph{and discovered} species ($f_1$ through $f_k$) are excellent predictors of even rarer \emph{and undiscovered} species $f_0$. Rare species simply carry most information about unseen species \cite{incidenceSurvey}.
-
-
-
-\begin{figure}
-  %\resizebox{\linewidth}{!}{
-  \centering\footnotesize
-  \def\arraystretch{1.9}
-  \begin{tabular}{@{}p{1.2cm}@{ }|@{ }p{0.8\columnwidth}}
-      \textbf{Estimator} & \textbf{Description and Formula}\\ [0.5ex]
-      \hline
-      \emph{Chao2} \cite{chao2} & \emph{Chao estimator (1984)}\newline
-      $\hat S_{Chao2}  =
-          \begin{cases}
-              S(n) + \frac{(n-1)}{n}\frac{f_1(n)^2}{2f_2(n)} &     \text{if $f_2(n) > 0$}\\
-              S(n) + \frac{(n-1)}{n}f_1(n)\frac{f_1(n) - 1}{2}  &       \text{if $f_2(n) = 0$}
-          \end{cases}$ \\
-      \hline
-      \emph{Chao2-bc} \cite{chao_bc}& \emph{Bias corrected Chao estimator (2005)}\newline
-      $ \hat S_{Chao2(bc)} = S(n) + f_1(n)\left[ \frac{f_1(n)-1}{2\left(f_2(n)+1\right)}\right]$ \\
-      \hline
-      \emph{iChao2} \cite{chiu2014}& \emph{Improved Chao estimator (2014)}\newline
-      $ \hat S_{iChao2}  = \hat S_{Chao2} \newline \textcolor{white}{.}\quad\quad
-              + \frac{(n-3)}{n}\frac{f_3(n)}{4f_4(n)} \cdot \max\left(f_1(n) -\frac{n - 3}{n-1}\frac{f_2(n)f_3(n)}{2f_4(n)},0\right)$\\
-      \hline
-      ICE \cite{lee1994} & \emph{Incidence-based coverage estimator (1994)}\newline
-      $\hat S_{ICE} = S(n)_{\text{\emph{freq}}} + \frac{S(n)_{\text{\emph{infr}}}}{\hat C(n)_{\text{\emph{ICE}}}}\hat \gamma^2$\newline
-      where\newline
-      $\hat \gamma^2 = \max \left(\frac{S(n)_{\text{\emph{infr}}}}{\hat C(n)_{\text{\emph{ICE}}}}\frac{n_{\text{\emph{infr}}}}{-1+n_{\text{\emph{infr}}}}\frac{\sum_{i=1}^{k}i (i-1)f_i(n)}{\left(n_\text{\emph{infr}}\right)^2}-1,0 \right)$\newline
-      $S(n)_{\text{\emph{infr}}} = \sum_{i=1}^{k}f_i(n)$,\quad
-      $S(n)_{\text{\emph{freq}}} = S(n) - S(n)_{\text{\emph{infr}}}$,\newline
-      $n_\text{\emph{infr}} = \sum_{i=1}^ki f_i(n)$,\quad
-      $\hat C(n)_{\text{\emph{ICE}}} = 1-f_1(n)/n_\text{\emph{infr}}$,\newline
-      $k$ is a constant (often, $k=10$), and\newline
-      \emph{infr} or \emph{freq} denote "rare" and "frequent" species categories.\\
-      %\newline \newline \text{for arbitrary threshold k,} \newline \text{\# infrequent species}  \quad  \newline \text{\# frequent species} \quad S(n)_{\text{\emph{freq}}} = \sum_{i>k}f_i(n) = S(n) - S(n)_{\text{\emph{infreq}}} \newline \text{sample coverage} \quad \hat C_{\text{\emph{infreq}}} = 1-f_1(n)\slash n \newline T_{\text{\emph{infreq}}} \quad \text{is the \# of inputs that belong to atleast one infrequent species}$\\
-      \hline
-      ICE-1 \cite{gotelli2013} & \emph{Modified incidence-based coverage estimator (2013)}\newline
-      $\hat S_{ICE-1} = S(n)_{\text{\emph{freq}}} + \frac{S(n)_{\text{\emph{infr}}}}{\hat C(n)_{\text{\emph{ICE}}}} \bm{\hat{\tilde \gamma}}^2_{\text{\emph{infr}}}$ \newline
-      where\newline
-      $\bm{\hat{\tilde \gamma}}^2_{\text{\emph{infr}}} = \max \left(\hat \gamma^2_{\text{\emph{infr}}} \left(\frac{1+n\left(1 - \hat C(n)_{\text{\emph{ICE}}}\right)\sum_{i=1}^{k}i(i-1)f_i(n)}{n\left(n-1\right) \hat C(n)_{\text{\emph{ICE}}}} \right), 0 \right)$\\
-      \hline
-      JK1 \cite{burnham1978}& \emph{First-order Jackknife estimator (1978)}\newline
-      $\hat S_{jk1}  = S(n) + \frac{n-1}{n}f_1(n) \approx S(n) + f_1(n)$ \\
-      \hline
-      JK2 \cite{burnham1978}& \emph{Second-order Jackknife estimator (1978)}\newline
-      $\hat S_{jk2} = S(n) + \frac{2n-3}{n}f1(n) - \frac{(n-2)^2}{n(n-1)}f_2(n) \newline \textcolor{white}{.}\quad\ \ \,
-          \approx S(n) + 2f_1(n) - f_2(n)$\\
-      \hline
-  \end{tabular}
-  %}
-  \caption{State-of-the-art species richness estimators under the Bernoulli-product model \cite{spade,incidenceSurvey}.}
-  \label{tab:estimators}
-\end{figure}
-
-\textbf{Incidence-based coverage estimators (ICE)} extend this idea of the improved Chao estimator \emph{iChao} to consider more than just singletons and doubletons and integrate the recent understanding of sample coverage $C(n)$. When the individuals are independently sampled from an invariant species distribution, the complement of the missing mass probability given by {Good-Turing estimator} \cite{good1953} (i.e. $\hat C = 1-f_1/n$) provides a highly accurate estimate of the current sample coverage. By incorporating sample coverage, the \emph{incidence-based coverage estimator} (ICE) was derived \cite{lee1994}. It assumes that any species distribution $\left\{p\right\}_{i=1}^S$ can be fully characterized by the coefficient of variation $\gamma^2$ and the mean incidence probability $1/S$ \cite{chao2014species}. Under ICE, species are distinguished, using an arbitrary threshold $k$, as ``frequent'' and ``rare'' (i.e., infrequent) species. Using this distinction, we can obtain an accurate estimate of $\gamma^2$ using only the rare species category. However, the ICE estimator is known to underestimate for highly heterogeneous distribution with very high species richness; like the ones we encounter in fuzzing. A modified version, ICE-1 \cite{gotelli2013} is derived through standard statistical approximations for such \emph{mega-diverse} communities; but with the same set of factors as ICE. For the modified ICE (\emph{ICE-1}), the coefficient of variation $\bm{\hat{\tilde \gamma}}^2$ is estimated as a factor of the coefficient of variation $\hat \gamma^2$ for the original ICE.
-
-\textbf{Jackknife (JK) estimators} for species richness are instances of the general Jackknife method, which uses resampling to estimate certain statistical parameters and to reduce bias. The $j^\text{th}$-order Jackknife estimate (JK-j) is obtained by excluding $j$ sample points from the original sample of size $n$. For instance, the first-order Jackknife $JK1$ of species richness \cite{burnham1978} uses the Good-Turing estimator $1-\widehat{C}(n)=f_1(n)/n$ of the probability of discovering (single) new species. \emph{Assuming} this probability be equivalent for the reduced sample with $n-1$ sampling units, the expected number of undiscovered species $f_0$ is approximate $(n-1)f_1/n$.
 
 % ---- End Model
 % --- Estimation
-\section{Reachability Estimation in Fuzzing}
+\subsection{Reachability Estimation in Fuzzing}
 \label{sec:reachability}
+
+\noindent\textbf{Estimators:} We build on prior work by continuing to use all state-of-the-art bio-statistical estimators for fuzzing effectiveness under the Bernoulli product model, as established in~\cite{liyanage2023reachable}. Additionally, inspired by recent studies on estimator performance for killable mutant prediction~\cite{Kuznetsov2024empirical}, we incorporate further estimators—including \emph{bootstrap}~\cite{smith1984nonparametric}, \emph{Zelterman}~\cite{bohning2010some}, and others previously unused in fuzzing—within our modeling framework.
+\vspace{1mm}
+
+\noindent\textbf{Ground Truth:} A fundamental challenge in evaluating the effectiveness es of a fuzzing campaign lies in the absence of an absolute ground truth.
 
 %With the introduction of the STADS statistical framework and the growing adoption of fuzzing, understanding a fuzzer's detection capacity has become increasingly important. As a result, statistical techniques for estimating maximum reachability $\hat{S}$ have gained prominence \cite{boehme2018stads,liyanage2023reachable,boehme2019assurances}. Most estimators of $\hat{S}$ that conform to the probabilistic model in \autoref{sec:model} are introduced to fuzzing from the well-established field of ecological bio-statistics. However, challenges affecting the accuracy and precision of these estimates have been discussed both in the original STADS framework \cite{boehme2018stads} and in more recent evaluations \cite{liyanage2023reachable} of estimator performance. We discuss two critical challenges in more detail that we believe have a significant impact on reachability estimation and its evaluation in fuzzing.
 
-\subsection{Adaptive bias}
-A key statistical challenge in greybox fuzzing is \emph{adaptive bias}: as coverage-increasing inputs are added as new seeds, the distribution $\pi_i$ for $i: 1 \leq i \leq S$ evolves throughout the fuzzing campaign \cite{liyanage2021security}. A fundamental assumption of the Bernoulli Product model—common in statistics and machine learning—is that samples are independent and identically distributed (\emph{iid}), meaning the distribution of detection probabilities remains unchanged over time.  
+%\subsection{Adaptive bias}
+%A key statistical challenge in greybox fuzzing is \emph{adaptive bias}: as coverage-increasing inputs are added as new seeds, the distribution $\pi_i$ for $i: 1 \leq i \leq S$ evolves throughout the fuzzing campaign \cite{liyanage2021security}. A fundamental assumption of the Bernoulli Product model—common in statistics and machine learning—is that samples are independent and identically distributed (\emph{iid}), meaning the distribution of detection probabilities remains unchanged over time.  
 
-This assumption holds in blackbox fuzzing campaigns where no new seeds are added to the seed corpus while the fuzzer is running. However, in greybox fuzzing, which is the predominant fuzzing technique today, the outcome of one sample influences subsequent samples, violating the independence assumption \cite{boehme2020boosting,boehme2018stads,liyanage2021security}. Consequently, applying existing statistical estimators to greybox fuzzing leads to \emph{adaptive bias}, where estimates systematically over- or under-estimate the true value in greybox campaigns.
+%This assumption holds in blackbox fuzzing campaigns where no new seeds are added to the seed corpus while the fuzzer is running. However, in greybox fuzzing, which is the predominant fuzzing technique today, the outcome of one sample influences subsequent samples, violating the independence assumption \cite{boehme2020boosting,boehme2018stads,liyanage2021security}. Consequently, applying existing statistical estimators to greybox fuzzing leads to \emph{adaptive bias}, where estimates systematically over- or under-estimate the true value in greybox campaigns.
 
-Therefore, developing novel estimation strategies that correct adaptive bias in statistical estimation of key performance parameters is crucial for assessing greybox fuzzing progress and predicting its future trajectory. Recent advancements have introduced techniques that mitigate adaptive bias to estimate \emph{residual risk} \cite{boehme2021residual} and to extrapolate \emph{coverage rate} \cite{liyanage2024extrapolating} in greybox fuzzing. However, state-of-the-art reachability estimators continue to be affected by adaptive bias.
+%Therefore, developing novel estimation strategies that correct adaptive bias in statistical estimation of key performance parameters is crucial for assessing greybox fuzzing progress and predicting its future trajectory. Recent advancements have introduced techniques that mitigate adaptive bias to estimate \emph{residual risk} \cite{boehme2021residual} and to extrapolate \emph{coverage rate} \cite{liyanage2024extrapolating} in greybox fuzzing. However, state-of-the-art reachability estimators continue to be affected by adaptive bias.
 
 
 \subsection{Challenge of Establishing Ground Truth for Evaluation}
