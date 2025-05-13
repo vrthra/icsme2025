@@ -81,7 +81,7 @@ colorlinks=true,linkcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue
 \def\[[#1\]]{\texttt{#1}}
 
 \def\term#1{\texttt{'\textbf{#1}'}}
-\def\nonterm#1{\textnormal{\emph{#1}}}
+\def\nonterm#1{\textlangle\textnormal{\emph{#1}}\textrangle}
 \def\regex#1{\texttt{{\color{blue}/}#1{\color{blue}/}}}
 \def\expandsto{\(\rightarrow{}\)}
 \usepackage{bbding}
@@ -666,7 +666,7 @@ def bsearch(x, v, n):
         return mid
   return None
 \end{lstlisting}
-\caption{Original \<bsearch> program}
+\caption{\<bsearch> program}
 \label{fig:bsearch1}
 \end{subfigure}
 \begin{subfigure}[h]{0.45\textwidth}   %28 min
@@ -698,16 +698,20 @@ We note that any structured program can be translated into a simpler program
 such that it contains only the following elements:
 (1) sequence of statements
 (2) if-then-else conditionals
-(3) loops without conditionals (e.g. \mbox{\<while True: \ldots>})
+(3) \<while> loops
 (4) procedure calls.
-As an example, we show in \Cref{fig:bsearch} how we translate \<bsearch> (\Cref{fig:bsearch1})
-to this simplified form (\Cref{fig:bsearch2}).
 Next, given such a simplified form and its control-flow,
 we can leverage the following rules to convert the control-flow to the context-free grammar~(\Cref{fig:cfg}).
-That is, (1) for any given loop, 
-
-
+That is, (1) for any given \<while C: L> loop, with a boolean conditional \<C>,
+it can be translated to an equivalent grammar rule
+%\begin{grammar}
+  \mbox{\nonterm{L} \expandsto \nonterm{C} \nonterm{L} $|$ \nonterm{C}}
+%\end{grammar}
+(2) for any conditional \<if C: B else: D>, translate to
+  \mbox{\nonterm{IF} \expandsto \nonterm{C} \term{T} \nonterm{B}  $|$ \nonterm{C} \term{F} \nonterm{D}}
+(3) procedure calls translate to their own nonterminal symbols.
 The details are given in \Cref{fig:cfg}.
+
 Conversely, given any non left-recursive context-free grammar, we can generate a
 recursive-descent parser by using the following rules:
 (1) Any nonterminal symbol is turned into a procedure in the parser.
