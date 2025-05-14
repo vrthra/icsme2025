@@ -590,42 +590,21 @@ Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ i
 %These limitations highlight the need for more robust, scalable, and accurate methods of defining and approximating ground truth in fuzzing evaluation, particularly as programs grow in size and complexity.
 
 % --- End Estimation
-\subsection{Control Flow}
-We generate large programs with complex control-flows
-by leveraging the isomorphism between control-flow graphs
-and context-free grammars.
-A control-flow graph is a representation of a program's execution flow,
-and is represented as a directed graph. \Cref{fig:cfg} provides
-examples of control-flow graphs for three procedures \<Y>, \<Z>, and \<X>.
+\subsection{Control-flow graphs}
+We generate large programs with complex control flow by leveraging the structural isomorphism between control-flow graphs and context-free grammars. A control-flow graph represents the possible execution paths of a program and is typically modeled as a directed graph. \Cref{fig:cfg} illustrates example control-flow graphs for three procedures: \<Y>, \<Z>, and \<X>.
 
-Each graph has a set of nodes $N$. For the purposes of this reserach,
-each node $N_{i}$ can be considered to represent a single statement in the
-program\footnote{A node is traditionally one basic-block, but the definition is
-equivalent.}. Furtheremore, each graph as a single entry point $P^{s}$ and a
-single exit point $P^{e}$, with the exeuction proceeding sequentially within the
-block. Each node is connected with other nodes by directed edges $E$, where each
-edge $E_{i,j}$ represents a possible transfer of control flow from from $N_i$
-to $N_j$. When there are multiple directed edges away from a given node, the
-edges are labelled. For example, in \Cref{tikz:condition}, node \<C>, which
-represents a conditional has two edges, labeled \<T> and \<F>.
+Each control-flow graph consists of a set of nodes $N$, where each node $N_i$ represents a program statement\footnote{Traditionally, a node corresponds to a basic block, but for the purposes of this work, we treat each node as a single statement without loss of generality.}. Every graph has a unique entry node $P^s$ and exit node $P^e$, with execution proceeding sequentially within the graph. The edges $E_{i,j}$ define the possible transfers of control from node $N_i$ to node $N_j$. When a node has multiple outgoing edges, these edges are labeled to distinguish between different execution paths. For example, in \Cref{tikz:condition}, node \<C> models a conditional statement with two labeled edges: \<T> (true) and \<F> (false).
 
-Each individual procedure has a separate control-flow graph, that is connected
-to other control-flow graphs which are the call sites of that procedure by a
-special call-edge. This is indicated by simply naming the node by the procedure
-name. For example in \Cref{tikz:sequence}, which represents the control-flow graph
-of a procedure \<X> with three statements, the nodes \<Y> and \<Z> represents
-call-edges to graphs \<Y> and \<Z>, which are procedures.
+Individual procedures have their own control-flow graphs, which are connected to other graphs at their call sites via call edges. These connections are denoted by labeling nodes with the name of the called procedure. For instance, in \Cref{tikz:sequence}, the control-flow graph of procedure \<X> includes nodes \<Y> and \<Z>, which represent calls to the corresponding procedures.
 
-Edges in a control-flow graph may be labeled to indicate their nature:
-
+We distinguish four types of edges in a control-flow graph:
 \begin{itemize}
-  \item \textbf{Unconditional edges}: Represent sequential or unconditional flow. For example, in \Cref{tikz:sequence}, all edges are sequential flows.
-    \item \textbf{Conditional edges}: Represent conditional branches that represent \<if-then-else> constructs. The edges are labeled. For example, in \Cref{tikz:condition}, node \<C>, which
-represents a conditional has two edges, labeled \<T> and \<F>.
-    \item \textbf{Loop edges}: Connect loop bodies back to loop conditions.
-      For example, in \Cref{tikz:iteration}, the lonnection \<B> $\rightarrow$ \<C> is a loop edge.
-    \item \textbf{Call edges}: Represent control-transfers due to procedure calls.
+\item \textbf{Unconditional edges:} Represent sequential execution without branching. For example, all edges in \Cref{tikz:sequence} are unconditional.
+\item \textbf{Conditional edges:} Represent branching decisions, such as in \<if-then-else> constructs. These edges are labeled, as seen in \Cref{tikz:condition}, where node \<C> branches to \<T> or \<F>.
+\item \textbf{Loop edges:} Represent cycles in the graph, corresponding to loop constructs. For example, in \Cref{tikz:iteration}, the edge from \<B> back to \<C> represents a loop.
+\item \textbf{Call edges:} Represent control transfers to other procedure graphs at call sites.
 \end{itemize}
+By constructing and composing such graphs, we can systematically generate large, structured programs with diverse control-flow behaviors.
 
 % \subsection{Example}
 % 
