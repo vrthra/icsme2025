@@ -395,7 +395,7 @@ fault localization techniques, program repair techniques, and so on.
   (b3) edge (b4);
   %(b4) edge (b5);
  \end{scope}
-\end{tikzpicture}         
+\end{tikzpicture}
 \caption{Sequence}
 \label{tikz:sequence}
 \end{subfigure}
@@ -591,28 +591,40 @@ Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ i
 
 % --- End Estimation
 \subsection{Control Flow}
-We generate large programs with complex control-flows  by leveraging the isomorphism between control-flow graphs and context-free grammars. % We next explain the program control-flow graphs. %We explain what is a control-flow graph next.
+We generate large programs with complex control-flows
+by leveraging the isomorphism between control-flow graphs
+and context-free grammars.
 A control-flow graph is a representation of a program's execution flow,
-and is represented as a directed graph. Each individual procedure has a
-separate control-flow graph, that is typically connected to other
-control-flow graphs which are the call sites of that procedure
+and is represented as a directed graph. \Cref{fig:cfg} provides
+examples of control-flow graphs for three procedures \<Y>, \<Z>, and \<X>.
 
-Each graph has a set of nodes $N$ for the purposes of this reserach,
+Each graph has a set of nodes $N$. For the purposes of this reserach,
 each node $N_{i}$ can be considered to represent a single statement in the
-program\footnote{ A node is traditionally one basic-block, but the definition is
+program\footnote{A node is traditionally one basic-block, but the definition is
 equivalent.}. Furtheremore, each graph as a single entry point $P^{s}$ and a
 single exit point $P^{e}$, with the exeuction proceeding sequentially within the
 block. Each node is connected with other nodes by directed edges $E$, where each
 edge $E_{i,j}$ represents a possible transfer of control flow from from $N_i$
-to $N_j$.
+to $N_j$. When there are multiple directed edges away from a given node, the
+edges are labelled. For example, in \Cref{tikz:condition}, node \<C>, which
+represents a conditional has two edges, labeled \<T> and \<F>.
 
-Edges in a CFG may be labeled to indicate their nature:
+Each individual procedure has a separate control-flow graph, that is connected
+to other control-flow graphs which are the call sites of that procedure by a
+special call-edge. This is indicated by simply naming the node by the procedure
+name. For example in \Cref{tikz:sequence}, which represents the control-flow graph
+of a procedure \<X> with three statements, the nodes \<Y> and \<Z> represents
+call-edges to graphs \<Y> and \<Z>, which are procedures.
+
+Edges in a control-flow graph may be labeled to indicate their nature:
 
 \begin{itemize}
-    \item \textbf{Unconditional edges}: Represent sequential flow or unconditional jumps.
-    \item \textbf{Conditional edges}: Represent conditional branches (if-then-else, switch).
+  \item \textbf{Unconditional edges}: Represent sequential or unconditional flow. For example, in \Cref{tikz:sequence}, all edges are sequential flows.
+    \item \textbf{Conditional edges}: Represent conditional branches that represent \<if-then-else> constructs. The edges are labeled. For example, in \Cref{tikz:condition}, node \<C>, which
+represents a conditional has two edges, labeled \<T> and \<F>.
     \item \textbf{Loop edges}: Connect loop bodies back to loop conditions.
-    \item \textbf{Exception edges}: Represent control transfers due to exception handling.
+      For example, in \Cref{tikz:iteration}, the lonnection \<B> $\rightarrow$ \<C> is a loop edge.
+    \item \textbf{Call edges}: Represent control-transfers due to procedure calls.
 \end{itemize}
 
 % \subsection{Example}
