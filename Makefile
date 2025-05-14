@@ -1,4 +1,4 @@
-icsme-registered.pdf: icsme-registered.tex icsme-registered.bib 
+icsme-registered.pdf: icsme-registered.tex icsme-registered.bib
 	latexmk -pdf icsme-registered.tex
 
 clean:
