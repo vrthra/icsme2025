@@ -415,7 +415,7 @@ fault localization techniques, program repair techniques, and so on.
 \end{subfigure}
 \begin{subfigure}[h]{0.3\textwidth}
 \begin{grammar}\centering
-  <Z> $\rightarrow$ <C> \term{T} <B> | <C> \term{F}
+  <Z> $\rightarrow$ <C> \term{T} <B> <Z> | <C> \term{F}
   %<L> $\rightarrow$ $\epsilon$\phantom{d a b c d f g}
 \end{grammar}
 \end{subfigure}
@@ -649,13 +649,14 @@ such that it contains only the following elements:
 (4) procedure calls.
 Next, given such a simplified form and its control-flow,
 we can leverage the following rules to convert the control-flow to the context-free grammar~(\Cref{fig:cfg}).
-That is, (1) for any given \<while C: L> loop, with a boolean conditional \<C>,
+That is,
+(1) for any conditional \<if C: A else: B>, translate to
+  \mbox{\nonterm{IF} \expandsto \nonterm{C} \term{T} \nonterm{A}  $|$ \nonterm{C} \term{F} \nonterm{B}}
+(2) for any given \<while C: B> loop, with a boolean conditional \<C>,
 it can be translated to an equivalent grammar rule
 %\begin{grammar}
-  \mbox{\nonterm{L} \expandsto \nonterm{C} \nonterm{L} $|$ \nonterm{C}}
+\mbox{\nonterm{L} \expandsto \nonterm{C} \nonterm{B} \nonterm{L} $|$ \nonterm{C}}
 %\end{grammar}
-(2) for any conditional \<if C: B else: D>, translate to
-  \mbox{\nonterm{IF} \expandsto \nonterm{C} \term{T} \nonterm{B}  $|$ \nonterm{C} \term{F} \nonterm{D}}
 (3) procedure definitions such as \<def P(): B \ldots> translate to a nonterminal symbol with the same
 name: \mbox{\nonterm{P} \expandsto \nonterm{B}}, and sequence of statements are simply captured
 directly with corresponding tokens.
