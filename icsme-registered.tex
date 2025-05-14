@@ -591,34 +591,20 @@ Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ i
 
 % --- End Estimation
 \subsection{Control Flow}
-We generate large programs with complex control-flows  by leveraging the isomorphism between control-flow graphs and context-free grammars. We next explain the program control-flow graphs.
-A control-flow graph (CFG) is a representation of a program's execution flow used in software engineering for program analysis, optimization, and verification.
+We generate large programs with complex control-flows  by leveraging the isomorphism between control-flow graphs and context-free grammars. % We next explain the program control-flow graphs. %We explain what is a control-flow graph next.
+A control-flow graph is a representation of a program's execution flow,
+and is represented as a directed graph. Each individual procedure has a
+separate control-flow graph, that is typically connected to other
+control-flow graphs which are the call sites of that procedure
 
-\subsection{Definition and Components}
-
-A control-flow graph $G$ is a directed graph $G = (N, E)$ where:
-
-\begin{itemize}
-    \item $N$ is a set of nodes representing basic blocks of code. A basic block is a sequence of consecutive statements with:
-    \begin{itemize}
-        \item A single entry point (no jumps into the middle of the block)
-        \item A single exit point (no jumps out of the middle of the block)
-        \item Execution proceeding sequentially within the block
-    \end{itemize}
-    
-    \item $E \subseteq N \times N$ is a set of directed edges representing possible transfers of control between basic blocks. Each edge $(n_i, n_j)$ indicates that control may flow from block $n_i$ to block $n_j$.
-\end{itemize}
-
-\subsection{Special Nodes}
-
-A CFG typically contains special nodes:
-
-\begin{itemize}
-    \item \textbf{Entry node}: The unique node where execution of the procedure begins.
-    \item \textbf{Exit node(s)}: Node(s) where execution of the procedure terminates.
-\end{itemize}
-
-\subsection{Edge Types}
+Each graph has a set of nodes $N$ for the purposes of this reserach,
+each node $N_{i}$ can be considered to represent a single statement in the
+program\footnote{ A node is traditionally one basic-block, but the definition is
+equivalent.}. Furtheremore, each graph as a single entry point $P^{s}$ and a
+single exit point $P^{e}$, with the exeuction proceeding sequentially within the
+block. Each node is connected with other nodes by directed edges $E$, where each
+edge $E_{i,j}$ represents a possible transfer of control flow from from $N_i$
+to $N_j$.
 
 Edges in a CFG may be labeled to indicate their nature:
 
@@ -629,27 +615,27 @@ Edges in a CFG may be labeled to indicate their nature:
     \item \textbf{Exception edges}: Represent control transfers due to exception handling.
 \end{itemize}
 
-\subsection{Example}
-
-For a simple code fragment:
-
-\begin{verbatim}
-if (x > 0) {
-    y = x + 1;
-} else {
-    y = x - 1;
-}
-return y;
-\end{verbatim}
-
-The corresponding CFG would have:
-\begin{itemize}
-    \item A node for the condition \texttt{x > 0}
-    \item A node for the true branch \texttt{y = x + 1}
-    \item A node for the false branch \texttt{y = x - 1}
-    \item A node for \texttt{return y}
-    \item Edges connecting these nodes according to the control flow
-\end{itemize}
+% \subsection{Example}
+% 
+% For a simple code fragment:
+% 
+% \begin{verbatim}
+% if (x > 0) {
+%     y = x + 1;
+% } else {
+%     y = x - 1;
+% }
+% return y;
+% \end{verbatim}
+% 
+% The corresponding CFG would have:
+% \begin{itemize}
+%     \item A node for the condition \texttt{x > 0}
+%     \item A node for the true branch \texttt{y = x + 1}
+%     \item A node for the false branch \texttt{y = x - 1}
+%     \item A node for \texttt{return y}
+%     \item Edges connecting these nodes according to the control flow
+% \end{itemize}
 
 \subsection{Context-free grammar}
 
