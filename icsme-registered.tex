@@ -44,6 +44,7 @@ colorlinks=true,linkcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue
 }
 \usepackage{tikz}
 \usepackage{pgfplots}
+\usepackage{balance}
 \pgfplotsset{compat=1.9}
 \usetikzlibrary{fit}
 \usetikzlibrary{positioning}
@@ -306,37 +307,10 @@ fault localization techniques, program repair techniques, and so on.
 
 \begin{figure*}
 %    \vspace{-2cm}
+%
 \begin{subfigure}[h]{0.3\textwidth}
 \centering
-\begin{tikzpicture}[auto,
-  node distance = 3mm,
-  start chain = going below,
-  start/.style = {ellipse,draw,text width= 1em,rounded corners,blur shadow,fill=white,
-        on chain,align=center},
-  box/.style = {draw,rounded corners,blur shadow,fill=white,
-        on chain,align=center},
-  stop/.style = {circle,minimum width=20pt,draw,blur shadow,fill=white,
-        on chain,align=center}]
- \node[start] (b1)    {s};
- \node[box] (b2)    {A};
- \node[box] (b3)    {B};
- \node[box] (b4)    {C};
- \node[stop,below=1mm of b4] (b5)    {e};
- %\node[stop] (b5)    {e};
- \begin{scope}[rounded corners,-latex]
-  \path
-  (b1) edge (b2)
-  (b2) edge (b3)
-  (b3) edge (b4)
-  (b4) edge (b5);
- \end{scope}
-\end{tikzpicture}         
-\caption{Sequence}
-\label{tikz:sequence}
-\end{subfigure}
-\begin{subfigure}[h]{0.3\textwidth}
-\centering
-
+%
 \begin{tikzpicture}[auto,
   node distance = 3mm,
   start chain = going below,
@@ -349,11 +323,11 @@ fault localization techniques, program repair techniques, and so on.
   stop/.style = {circle,minimum width=20pt,draw,blur shadow,fill=white,
         on chain,align=center}
 ]
- \node[start] (b1)    {s};
+ \node[start] (b1)    {$Y^s$};
  \node[cond] (b2)    {C};
  \node[box, below left=0.5cm and 0.6cm of b2] (b21) {A};
  \node[box, below right=0.5cm and 0.6cm of b2] (b22) {B};
- \node[stop,below=12mm of b2] (b3)    {e};
+ \node[stop,below=12mm of b2] (b3)    {$Y^e$};
  \begin{scope}[rounded corners,-latex]
  \path
  (b1) edge (b2);
@@ -380,11 +354,11 @@ fault localization techniques, program repair techniques, and so on.
   on chain,align=center},
   stop/.style = {circle,minimum width=20pt,draw,blur shadow,fill=white,
   on chain,align=center}]
- \node[start] (b1)    {s};      
+ \node[start] (b1)    {$Z^s$};      
  \node[cond] (b2)    {C};      
  \node[box] (b3)    {B};  
  %\node[stop] (b4)    {e};
- \node[stop,below=4mm of b3] (b4)    {e};
+ \node[stop,below=4mm of b3] (b4)    {$Z^e$};
  \begin{scope}[rounded corners,-latex]
   \path (b2.-40) edge[bend left=50] (b4.40)
   (b1) edge node [midway,below, xshift=-12pt,yshift=-25pt] {T}(b2)
@@ -397,16 +371,40 @@ fault localization techniques, program repair techniques, and so on.
 \caption{Iteration}
 \label{tikz:iteration}
 \end{subfigure}
-
-\vspace{10pt}
 \begin{subfigure}[h]{0.3\textwidth}
-\begin{grammar}\centering
-  <s> $\rightarrow$ <A> <B> <C>
-\end{grammar}
+\centering
+\begin{tikzpicture}[auto,
+  node distance = 3mm,
+  start chain = going below,
+  start/.style = {ellipse,draw,text width= 1em,rounded corners,blur shadow,fill=white,
+        on chain,align=center},
+  box/.style = {draw,rounded corners,blur shadow,fill=white,
+        on chain,align=center},
+  stop/.style = {circle,minimum width=20pt,draw,blur shadow,fill=white,
+        on chain,align=center}]
+ \node[start] (b1)    {$X^{s}$};
+ \node[box,below=5mm of b1] (b2)    {Y};
+ \node[box,below=5mm of b2] (b3)    {Z};
+ %\node[box] (b4)    {C};
+ \node[stop,below=5mm of b3] (b4)    {$X^{e}$};
+ %\node[stop] (b5)    {e};
+ \begin{scope}[rounded corners,-latex]
+  \path
+  (b1) edge (b2)
+  (b2) edge (b3)
+  (b3) edge (b4);
+  %(b4) edge (b5);
+ \end{scope}
+\end{tikzpicture}         
+\caption{Sequence}
+\label{tikz:sequence}
 \end{subfigure}
+\vspace{10pt}
+
+
 \begin{subfigure}[h]{0.3\textwidth}
 \begin{grammar}\centering
-    <s> $\rightarrow$ <C> \term{T} <A> | <C> \term{F} <B>
+    <Y> $\rightarrow$ <C> \term{T} <A> | <C> \term{F} <B>
 \end{grammar}
 %\begin{grammar}\centering
 %  <s> $\rightarrow$ <C> <IF>
@@ -417,13 +415,16 @@ fault localization techniques, program repair techniques, and so on.
 \end{subfigure}
 \begin{subfigure}[h]{0.3\textwidth}
 \begin{grammar}\centering
-  <s> $\rightarrow$ <C> \term{T} <B> | <C> \term{F}
+  <Z> $\rightarrow$ <C> \term{T} <B> | <C> \term{F}
   %<L> $\rightarrow$ $\epsilon$\phantom{d a b c d f g}
-  
 \end{grammar}
-
 \end{subfigure}
-
+\begin{subfigure}[h]{0.3\textwidth}
+\begin{grammar}\centering
+  <X> $\rightarrow$ <Y> <Z>
+\end{grammar}
+\end{subfigure}
+%
 \caption{The basic control-flow structures}
 \label{fig:cfg}
 \end{figure*}
@@ -459,7 +460,7 @@ for the same fuzzing campaign duration.
 framework to generate synthetic program benchmarks that emulates real-world
 programs, and use this to evaluate maximum reachability estimators.
 
-  \item \textbf{Sampling-unit based evaluation of reliability} We will evaluate
+  \item \textbf{Sampling-unit based evaluation of reliability:} We will evaluate
     the reliability of maximum reachability estimators on 32 real-world programs
     by comparing the estimates under sampling units of diverse granularity.
 
@@ -470,10 +471,10 @@ programs, and use this to evaluate maximum reachability estimators.
 %\item\textcolor{red}{In this paper we propose a solution to the question of how to interpret the estimate from Chao on time based samples.}
 \end{itemize}
 
-The remainder of this paper is organized as follows. Section~\ref{sec:model} introduces the probabilistic model underlying fuzzing and the assumptions made in statistical reachability estimation. Section~\ref{sec:reachability} discusses current approaches to reachability estimation in fuzzing. Section~\ref{sec:method} presents our methodology for assessing the reliability of statistical estimators of maximum reachability. Section~\ref{sec:setup} details the experimental setup used to evaluate our approach. Finally, Section~\ref{sec:conclusion} concludes the paper and outlines directions for future research.
+The remainder of this paper is organized as follows. Section~\ref{sec:model} introduces the statistical reachability estimation and evaluation in fuzzing. Section~\ref{sec:method} presents our methodology for assessing the accuracy and reliability of statistical estimators of maximum reachability. Section~\ref{sec:setup} details the experimental setup used to evaluate our approach. Then, Section~\ref{sec:related} discusses the associated related work Finally, Section~\ref{sec:conclusion} concludes the paper and outlines directions for future research.
 
 % ---- Model
-\section{Preliminaries} \label{sec:model}
+\section{Reachability Estimation in Fuzzing} \label{sec:model}
 
 \subsection{Probabilistic Model for Fuzzing}
 
@@ -532,13 +533,23 @@ Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ i
 
 % ---- End Model
 % --- Estimation
-\subsection{Reachability Estimation in Fuzzing}
+\subsection{Estimators of Fuzzer Effectiveness and Ground Truth}
 \label{sec:reachability}
 
-\noindent\textbf{Estimators:} We build on prior work by continuing to use all state-of-the-art bio-statistical estimators for fuzzing effectiveness under the Bernoulli product model, as established in~\cite{liyanage2023reachable}. Additionally, inspired by recent studies on estimator performance for killable mutant prediction~\cite{Kuznetsov2024empirical}, we incorporate further estimators—including \emph{bootstrap}~\cite{smith1984nonparametric}, \emph{Zelterman}~\cite{bohning2010some}, and others previously unused in fuzzing—within our modeling framework.
+\noindent\textbf{Estimators ($\hat{S}$):} We build on prior work by continuing to use all state-of-the-art bio-statistical estimators for fuzzing effectiveness under the Bernoulli product model, as established in~\cite{liyanage2023reachable}. Additionally, inspired by recent studies on estimator performance for killable mutant estimation~\cite{Kuznetsov2024empirical}, we incorporate further estimators—including \emph{bootstrap}~\cite{smith1984nonparametric}, \emph{Zelterman}~\cite{bohning2010some}, and others previously unused in fuzzing—within our modeling framework.
 \vspace{1mm}
 
-\noindent\textbf{Ground Truth:} A fundamental challenge in evaluating estimators of fuzzing effectiveness lies in the absence of an absolute ground truth. 
+\noindent\textbf{Ground Truth ($S$):} A key challenge in evaluating estimators of fuzzing effectiveness is the absence of an absolute ground truth. Existing strategies for approximating ground truth in fuzzing evaluation each have inherent limitations:
+
+\begin{enumerate}
+    \item \emph{\textbf{Plateaued Coverage~\cite{boehme2018stads}:}} It was common practice to treat the observed coverage at the end of a fuzzing campaign as ground truth, particularly when the coverage curve plateaued and showed no further growth. However, this stability may be illusory, as new behaviors can still emerge given more time~\cite{dijkstra2002ewd,boehme2021residual}.
+    
+    \item \emph{\textbf{Small-scale Programs~\cite{liyanage2023reachable}:}} For programs with limited behavioral diversity, fuzzers often reach coverage saturation quickly, making them suitable for ground truth benchmarking. Yet, they poorly reflect the behavioral complexity of real-world programs, where highly skewed behavior distributions—akin to ecological settings with few common and many rare species—can cause overestimation of estimator accuracy.
+    
+    \item \emph{\textbf{Bootstrapping~\cite{liyanage2023reachable}:}} Once coverage stabilizes, bootstrapping/resampling from obtained campaign data enables statistical approximation of ground truth. This relies on the assumption that the empirical distribution closely mirrors the underlying behavior space—an assumption that breaks down when regions that could deviate this distribution remain unreached or input generation is biased.
+\end{enumerate}
+
+
 
 %With the introduction of the STADS statistical framework and the growing adoption of fuzzing, understanding a fuzzer's detection capacity has become increasingly important. As a result, statistical techniques for estimating maximum reachability $\hat{S}$ have gained prominence \cite{boehme2018stads,liyanage2023reachable,boehme2019assurances}. Most estimators of $\hat{S}$ that conform to the probabilistic model in \autoref{sec:model} are introduced to fuzzing from the well-established field of ecological bio-statistics. However, challenges affecting the accuracy and precision of these estimates have been discussed both in the original STADS framework \cite{boehme2018stads} and in more recent evaluations \cite{liyanage2023reachable} of estimator performance. We discuss two critical challenges in more detail that we believe have a significant impact on reachability estimation and its evaluation in fuzzing.
 
@@ -550,33 +561,35 @@ Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ i
 %Therefore, developing novel estimation strategies that correct adaptive bias in statistical estimation of key performance parameters is crucial for assessing greybox fuzzing progress and predicting its future trajectory. Recent advancements have introduced techniques that mitigate adaptive bias to estimate \emph{residual risk} \cite{boehme2021residual} and to extrapolate \emph{coverage rate} \cite{liyanage2024extrapolating} in greybox fuzzing. However, state-of-the-art reachability estimators continue to be affected by adaptive bias.
 
 
-\subsection{Challenge of Establishing Ground Truth for Evaluation}
+%\subsection{Challenge of Establishing Ground Truth for Evaluation}
 
-As with other software testing techniques, fuzzing aims to progressively explore diverse program behaviors—such as increasing code coverage or triggering distinct faults—over time. However, a fundamental challenge in evaluating the effectiveness of a fuzzing campaign lies in the absence of an absolute ground truth. Specifically, we can never be certain that all reachable program behaviors have been exercised, regardless of how long the fuzzer runs \cite{dijkstra2002ewd}. There always exists a non-zero probability that previously undiscovered behaviors may emerge as new test inputs are generated \cite{boehme2021residual}.
+%As with other software testing techniques, fuzzing aims to progressively explore diverse program behaviors—such as increasing code coverage or triggering distinct faults—over time. However, a fundamental challenge in evaluating the effectiveness of a fuzzing campaign lies in the absence of an absolute ground truth. Specifically, we can never be certain that all reachable program behaviors have been exercised, regardless of how long the fuzzer runs \cite{dijkstra2002ewd}. There always exists a non-zero probability that previously undiscovered behaviors may emerge as new test inputs are generated \cite{boehme2021residual}.
 
-Despite this inherent uncertainty, the effectiveness of a fuzzing approach is often evaluated based on its maximum observed reachability within a fixed time or resource budget. For example, widely used benchmarks such as Fuzzbench \cite{metzman2021fuzzbench} and Magma \cite{hazimeh2020magma} assess fuzzers by measuring the coverage achieved after executing for a predetermined duration (e.g., 24 hours in the case of Fuzzbench). However, such evaluations can be misleading in scenarios where novel program behaviors are discovered beyond the allotted time window. This limitation underscores the need for more conclusive and robust quantitative techniques to assess fuzzing effectiveness—particularly methods grounded in data-driven estimation of maximum reachability. Still, establishing the ground truth remains a cornerstone for reliably evaluating such quantitative reachability measures.
+%Despite this inherent uncertainty, the effectiveness of a fuzzing approach is often evaluated based on its maximum observed reachability within a fixed time or resource budget. For example, widely used benchmarks such as Fuzzbench \cite{metzman2021fuzzbench} and Magma \cite{hazimeh2020magma} assess fuzzers by measuring the coverage achieved after executing for a predetermined duration (e.g., 24 hours in the case of Fuzzbench). However, such evaluations can be misleading in scenarios where novel program behaviors are discovered beyond the allotted time window. This limitation underscores the need for more conclusive and robust quantitative techniques to assess fuzzing effectiveness—particularly methods grounded in data-driven estimation of maximum reachability. Still, establishing the ground truth remains a cornerstone for reliably evaluating such quantitative reachability measures.
 
-\subsection{Existing Methods in Approximating Ground-Truth for Maximum Reachability}
+%\subsection{Existing Methods in Approximating Ground-Truth for Maximum Reachability}
 
-Even though achieving a 100\% guarantee of exhausting all possible program behaviors is inherently unattainable, the longer a fuzzing campaign proceeds without encountering new behaviors, the lower the probability of discovering additional ones becomes. This diminishing discovery rate, in turn, increases our confidence in treating the current state as an empirical approximation of the ground truth for maximum reachability. However, recent empirical evidence based on extensive 7-day AFL++ \cite{fioraldi2020AFL++} fuzzing campaigns across 32 real-world C programs demonstrates that reaching a true asymptote in coverage is often elusive in practice \cite{liyanage2023reachable}. While coverage curves may appear to saturate when plotted on a linear scale, this effect is far less discernible on a logarithmic scale—suggesting that new behaviors continue to emerge at a slow but non-negligible rate. This observation further complicates the task of defining and approximating ground truth in fuzzing evaluation. Moreover, the same study highlights the limitations of using static analysis for estimating maximum reachable coverage, revealing both under- and over-approximation in practice. 
+%Even though achieving a 100\% guarantee of exhausting all possible program behaviors is inherently unattainable, the longer a fuzzing campaign proceeds without encountering new behaviors, the lower the probability of discovering additional ones becomes. This diminishing discovery rate, in turn, increases our confidence in treating the current state as an empirical approximation of the ground truth for maximum reachability. However, recent empirical evidence based on extensive 7-day AFL++ \cite{fioraldi2020AFL++} fuzzing campaigns across 32 real-world C programs demonstrates that reaching a true asymptote in coverage is often elusive in practice \cite{liyanage2023reachable}. While coverage curves may appear to saturate when plotted on a linear scale, this effect is far less discernible on a logarithmic scale—suggesting that new behaviors continue to emerge at a slow but non-negligible rate. This observation further complicates the task of defining and approximating ground truth in fuzzing evaluation. Moreover, the same study highlights the limitations of using static analysis for estimating maximum reachable coverage, revealing both under- and over-approximation in practice. 
 
-To address this challenge, the current fuzzing literature proposes state-of-the-art strategies to approximate ground-truth reachability, particularly for evaluating statistical estimators of maximum reachability:
+%To address this challenge, the current fuzzing literature proposes state-of-the-art strategies to approximate ground-truth reachability, particularly for evaluating statistical estimators of maximum reachability:
 
-\begin{enumerate}
-    \item \textbf{Using small-scale programs as subjects:} When the subject program is relatively small and contains only a limited number of distinct reachable behaviors, fuzzers are more likely to achieve saturation within a feasible time frame. This makes such programs suitable proxies for maximum reachability estimator evaluations with ground-truth.
+%\begin{enumerate}
+%    \item \textbf{Using small-scale programs as subjects:} When the subject program is relatively small and contains only a limited number of distinct reachable behaviors, fuzzers are more likely to achieve saturation within a feasible time frame. This makes such programs suitable proxies for maximum reachability estimator evaluations with ground-truth.
     
-    \item \textbf{Bootstrapping from campaign data:} After executing a fuzzer for a sufficiently long period—ideally until the coverage or bug discovery curve exhibits signs of plateauing—bootstrap resampling can be applied to the observed data. The key intuition is that the relationship between the empirical distribution of discovered behaviors and the underlying theoretical population mirrors the relationship between bootstrap samples and the empirical distribution. This method enables statistical approximation of ground-truth reachability without requiring absolute exhaustiveness.
-\end{enumerate}
+%    \item \textbf{Bootstrapping from campaign data:} After executing a fuzzer for a sufficiently long period—ideally until the coverage or bug discovery curve exhibits signs of plateauing—bootstrap resampling can be applied to the observed data. The key intuition is that the relationship between the empirical distribution of discovered behaviors and the underlying theoretical population mirrors the relationship between bootstrap samples and the empirical distribution. This method enables statistical approximation of ground-truth reachability without requiring absolute exhaustiveness.
+%\end{enumerate}
 
-\subsection{Drawbacks of Existing Ground-Truth Approaches}
+%\subsection{Drawbacks of Existing Ground-Truth Approaches}
 
-Despite efforts to approximate ground truth in fuzzing evaluation, existing methods, particularly those relying on small-scale programs, have significant limitations. While small programs enable faster saturation of program behaviors, they fail to reflect the complexity and diversity of real-world systems, which often exhibit a highly skewed distribution of behaviors—similar to ecological environments with a few abundant behaviors and many rare ones. In contrast, smaller programs tend to have a less skewed distribution of species, leading to an overestimation of fuzzing estimators’ accuracy. This discrepancy results in misleading conclusions when performance estimators derived from small-scale programs are applied to larger, more complex systems, where the species distribution is less predictable. Consequently, the primary drawback of using small-scale programs for ground-truth approximation is the risk of overstating the effectiveness of fuzzing approaches when applied to real-world software.
+%Despite efforts to approximate ground truth in fuzzing evaluation, existing methods, particularly those relying on small-scale programs, have significant limitations. While small programs enable faster saturation of program behaviors, they fail to reflect the complexity and diversity of real-world systems, which often exhibit a highly skewed distribution of behaviors—similar to ecological environments with a few abundant behaviors and many rare ones. In contrast, smaller programs tend to have a less skewed distribution of species, leading to an overestimation of fuzzing estimators’ accuracy. This discrepancy results in misleading conclusions when performance estimators derived from small-scale programs are applied to larger, more complex systems, where the species distribution is less predictable. Consequently, the primary drawback of using small-scale programs for ground-truth approximation is the risk of overstating the effectiveness of fuzzing approaches when applied to real-world software.
 
-In the case of bootstrapping, the core assumption—that the empirical distribution obtained from a fuzzing campaign reasonably approximates the true underlying distribution of all possible program behaviors—fails to satisfy when the campaign has not yet thoroughly explored critical regions of the codebase or when input generation is inherently biased. This assumption further relies on the expectation that the future trajectory of behavior discovery will not significantly deviate from its current trend, implying that species accumulation will smoothly approach saturation. However, without additional quantitative evidence to support the stability of this trajectory—such as statistical indicators of diminishing returns or convergence metrics—such assumptions remain speculative. In the absence of such validation, bootstrapped estimates may result in substantial over- or under-estimations of maximum reachability, ultimately undermining the reliability of fuzzing effectiveness evaluations.  
+%In the case of bootstrapping, the core assumption—that the empirical distribution obtained from a fuzzing campaign reasonably approximates the true underlying distribution of all possible program behaviors—fails to satisfy when the campaign has not yet thoroughly explored critical regions of the codebase or when input generation is inherently biased. This assumption further relies on the expectation that the future trajectory of behavior discovery will not significantly deviate from its current trend, implying that species accumulation will smoothly approach saturation. However, without additional quantitative evidence to support the stability of this trajectory—such as statistical indicators of diminishing returns or convergence metrics—such assumptions remain speculative. In the absence of such validation, bootstrapped estimates may result in substantial over- or under-estimations of maximum reachability, ultimately undermining the reliability of fuzzing effectiveness evaluations.  
 
-These limitations highlight the need for more robust, scalable, and accurate methods of defining and approximating ground truth in fuzzing evaluation, particularly as programs grow in size and complexity.
+%These limitations highlight the need for more robust, scalable, and accurate methods of defining and approximating ground truth in fuzzing evaluation, particularly as programs grow in size and complexity.
 
 % --- End Estimation
+\subsection{Grammars}
+\textsc{Explaining grammars here -- we need space.}
 % --- Methodology
 \section{Methodology} \label{sec:method}
 \begin{figure*} %{r}{7cm} %[12]
@@ -624,7 +637,7 @@ def bsearch(x, v, n):
 \label{fig:bsearch}
 \end{figure*}
 We next describe our proposed methodology for overcoming the limitations discussed in \Cref{sec:reachability}.
-\subsection{Evaluating Estimators of \texorpdfstring{$\hat{S}$}{S-hat} Against Accurate Ground Truth}
+\subsection{Evaluating Estimators of \texorpdfstring{$S$}{S} Against Accurate Ground Truth}
 To overcome the problem due to non-availability of complex programs with available
 maximum coverage, we propose a novel methodology.
 
@@ -710,7 +723,7 @@ as context-sensitivity.
 
 \noindent\textbf{Scalability and Applicability:} This methodology is designed to generate large-scale C parsers that consist of thousands of lines of code and complex control-flow.
 
-\subsection{Assessing Reliability \texorpdfstring{$\hat{S}$}{S-hat} Estimators Without Ground truth}
+\subsection{Assessing Reliability of \texorpdfstring{$\hat{S}$}{S-hat} Estimators Without Ground truth}
 To overcome any limitation that may exist due to the synthetic nature of our
 previously proposed benchmark, we propose a second criterion that can be applied
 to real-world benchmarks without relying on availability of ground truth.
@@ -779,6 +792,7 @@ We select a diverse set of real-world C programs from the FuzzBench platform \ci
 
 
 \section{Related Work}
+\label{sec:related}
 
 Reachable program behaviors (e.g. code coverage and discovered bugs) determine the \emph{effectiveness} of a software testing process. For non-trivial programs, exhaustively exercising all possible behaviors is infeasible. Consequently, testing is often viewed as a means to demonstrate the presence of bugs, but not their absence~\cite{dijkstra2022reliability}. Despite this limitation, substantial effort has been directed toward increasing maximum reachability to enhance software security and reliability. Nevertheless, determining reachability remains a fundamental challenge in software testing. In fact, an efficient and precise determination of reachable code would effectively resolve the software verification problem~\cite{liyanage2023reachable}. 
 
@@ -786,6 +800,7 @@ Efforts to approximate reachability quantitatively have gained traction in the s
 
 To assess reachability or unreachability in dynamic analysis, both constraint-solving techniques such as SMT\footnote{SMT—Satisfiability Modulo Theory} and data-driven estimation methods have been explored. Naus et al.~\cite{naus2023low} proposed a technique for automatically generating preconditions to trigger specific post-conditions (e.g., bugs) using low-level code analysis. Similarly, Liew et al.~\cite{liew2019just} demonstrated how to encode SMT formulas within coverage-guided fuzzers to discover inputs that reach targeted program locations. In contrast, statistical approaches directly attempt to estimate the test effectiveness (aka maximum reachability) through observed behaviors. The pioneering STADS framework~\cite{boehme2018stads} introduced a suite of bio-statistical estimators by modeling fuzzing as a statistical sampling process. A recent evaluation of these estimators highlighted key challenges associated with reachability estimation~\cite{liyanage2023reachable}. When applied to estimate the number of killable mutants in mutation analysis, Kuznetsov et al.~\cite{Kuznetsov2024empirical} empirically demonstrated the unreliability of STADS estimators due to variations in sampling unit definitions. This finding, together with other recent studies, underscores the need for \emph{structure-aware} estimators that incorporate internal program structure, as opposed to structure-agnostic alternatives~\cite{lee2023statistical}.
 
+\todo{Talk about maze generation -- fuzzle}
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -797,7 +812,7 @@ the sampling units used.
 
 %\section{Authors and Affiliations}
 
-
+\balance
 \bibliographystyle{IEEEtran}
 \bibliography{icsme-registered.bib}
 
