@@ -474,10 +474,12 @@ programs, and use this to evaluate maximum reachability estimators.
 The remainder of this paper is organized as follows. Section~\ref{sec:model} introduces the statistical reachability estimation and evaluation in fuzzing. Section~\ref{sec:method} presents our methodology for assessing the accuracy and reliability of statistical estimators of maximum reachability. Section~\ref{sec:setup} details the experimental setup used to evaluate our approach. Then, Section~\ref{sec:related} discusses the associated related work Finally, Section~\ref{sec:conclusion} concludes the paper and outlines directions for future research.
 
 % ---- Model
-\section{Reachability Estimation in Fuzzing} \label{sec:model}
-
+%\section{Reachability Estimation in Fuzzing} 
+\section{Preliminaries} \label{sec:model}
+In this section, we first explain the theoretical underpinnings of the reachibility estimation models. 
+Next, we introduce the context-free grammar, and explain
+the control-flow graphs.
 \subsection{Probabilistic Model for Fuzzing}
-
 The STADS\footnote{STADS—Software Testing As Discovery of Species} framework~\cite{boehme2018stads,boehme2021residual,nguyen2022bedivfuzz,boehme2020boosting} formalizes
 fuzzing as a statistical sampling process $\mathcal{F}$. Each test input is drawn with replacement from the program's input space $\pmb{\mathcal{D}}$. Assuming a sequence of $N$ independent and identically distributed (i.i.d.) random variables are drawn, we formally define the fuzzing campaign $\mathcal{F}$ as:
 
@@ -588,8 +590,86 @@ Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ i
 %These limitations highlight the need for more robust, scalable, and accurate methods of defining and approximating ground truth in fuzzing evaluation, particularly as programs grow in size and complexity.
 
 % --- End Estimation
-\subsection{Grammars}
-\textsc{Explaining grammars here -- we need space.}
+\subsection{Control Flow}
+We generate large programs with complex control-flows  by leveraging the isomorphism between control-flow graphs and context-free grammars. We next explain the program control-flow graphs.
+A control-flow graph (CFG) is a representation of a program's execution flow used in software engineering for program analysis, optimization, and verification.
+
+\subsection{Definition and Components}
+
+A control-flow graph $G$ is a directed graph $G = (N, E)$ where:
+
+\begin{itemize}
+    \item $N$ is a set of nodes representing basic blocks of code. A basic block is a sequence of consecutive statements with:
+    \begin{itemize}
+        \item A single entry point (no jumps into the middle of the block)
+        \item A single exit point (no jumps out of the middle of the block)
+        \item Execution proceeding sequentially within the block
+    \end{itemize}
+    
+    \item $E \subseteq N \times N$ is a set of directed edges representing possible transfers of control between basic blocks. Each edge $(n_i, n_j)$ indicates that control may flow from block $n_i$ to block $n_j$.
+\end{itemize}
+
+\subsection{Special Nodes}
+
+A CFG typically contains special nodes:
+
+\begin{itemize}
+    \item \textbf{Entry node}: The unique node where execution of the procedure begins.
+    \item \textbf{Exit node(s)}: Node(s) where execution of the procedure terminates.
+\end{itemize}
+
+\subsection{Edge Types}
+
+Edges in a CFG may be labeled to indicate their nature:
+
+\begin{itemize}
+    \item \textbf{Unconditional edges}: Represent sequential flow or unconditional jumps.
+    \item \textbf{Conditional edges}: Represent conditional branches (if-then-else, switch).
+    \item \textbf{Loop edges}: Connect loop bodies back to loop conditions.
+    \item \textbf{Exception edges}: Represent control transfers due to exception handling.
+\end{itemize}
+
+\subsection{Example}
+
+For a simple code fragment:
+
+\begin{verbatim}
+if (x > 0) {
+    y = x + 1;
+} else {
+    y = x - 1;
+}
+return y;
+\end{verbatim}
+
+The corresponding CFG would have:
+\begin{itemize}
+    \item A node for the condition \texttt{x > 0}
+    \item A node for the true branch \texttt{y = x + 1}
+    \item A node for the false branch \texttt{y = x - 1}
+    \item A node for \texttt{return y}
+    \item Edges connecting these nodes according to the control flow
+\end{itemize}
+
+\subsection{Context-free grammar}
+
+A context-free grammar consists of a set of definitions, where each definition corresponds to a \emph{nonterminal} symbol. Each definition contains multiple production rules that specify how the nonterminal can be constructed. The following
+are the components of a context-free grammar.
+
+\begin{itemize}
+    \item \textbf{Nonterminal symbols}: Named syntactic variables that represent phrase structures in the language. In \Cref{fig:cfg}, symbols such as \nonterm{C} are nonterminals.
+    \item \textbf{Terminal symbols}: The actual vocabulary of the language being defined. In \Cref{fig:cfg}, symbols such as \term{T} are terminals.
+    \item \textbf{Definitions}: Each nonterminal symbol has a definition consisting of one or more alternative production rules. These alternatives represent the different ways the nonterminal can be constructed. In \Cref{fig:cfg}, 
+    \mbox{\nonterm{Y} \expandsto \nonterm{C} \term{T} \nonterm{A} $|$ \nonterm{C} \term{F} \nonterm{B}}
+    is a definition for \nonterm{Y} with two alternative production rules. 
+    \item \textbf{Production rules}: Each rule specifies a possible form for the nonterminal on the left-hand side. A rule consists of a sequence of terminals and nonterminals that can replace the left-hand nonterminal in a derivation.
+    In \Cref{fig:cfg}, 
+    \mbox{\nonterm{Y} \expandsto \nonterm{C} \term{T} \nonterm{A}} is one of the production rules for \nonterm{Y}, the other being \mbox{\nonterm{Y} \expandsto \nonterm{C} \term{F} \nonterm{B}}.
+\end{itemize}
+\Cref{fig:bsearch3} is an example for a context-free grammar.
+
+% left-recursion and right recursion
+
 % --- Methodology
 \section{Methodology} \label{sec:method}
 \begin{figure*} %{r}{7cm} %[12]
