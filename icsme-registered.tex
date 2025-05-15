@@ -207,56 +207,51 @@ rahul.gopinath@sydney.edu.au}
 
 
 \begin{abstract}
-Fuzzers are often guided by coverage, making the estimation of maximum
-possible coverage a key concern in fuzzing.
-However, achieving 100\% coverage is impossible for most real-world
-software systems, regardless of effort expended.
-While static analysis of reachability can provide an upper bound,
+Fuzzers are often guided by coverage, making the estimation of maximum 
+achievable coverage a key concern in fuzzing.
+However, achieving 100\% coverage is infeasible for most real-world
+software systems, regardless of effort.
+While static reachability analysis can provide an upper bound,
 it is often highly inaccurate.
-Recently, statistical estimation based on species richness estimators
-in biostatistics have been proposed as a potential solution.
-However, a lack of reliable benchmarks with labeled ground truth has
-limited a thorough evaluation of the accuracy of this approach.
+Recently, statistical estimation methods based on species richness
+estimators from biostatistics have been proposed as a potential solution.
+Yet, the lack of reliable benchmarks with labeled ground truth has
+limited rigorous evaluation of their accuracy.
 
-To address this challenge, we propose an evaluation framework
-that generates complex programs with large and complex control flows
-synthetically where 100\% reachability is assured, providing the
-ground-truth for evaluation.
-Secondly, we propose a novel check for the reliability of reachability
-estimators using real-world benchmarks, but without using labeled ground
-truth---by varying the size of sampling units, which, under theory
-should not impact the estimation.
+To address this challenge, we propose an evaluation framework that
+synthetically generates large programs with complex control flows,
+ensuring well-defined reachability and providing ground truth for evaluation.
+Additionally, we propose a novel reliability check for these estimators
+on real-world benchmarks without labeled ground truth—by varying the size
+of sampling units, which, in theory, should not affect the estimate.
 
-Our work will identify the most reliable approaches to estimating maximum
-possible coverage in real-world fuzzing campaigns.
+Our work aims to identify the most reliable methods for estimating
+maximum achievable coverage in practical fuzzing campaigns.
 \end{abstract}
 
 
 \section{Introduction}
+
 Fuzzing is an automated testing technique that leverages guidance provided
 by coverage~\cite{boehme2016coverage}.
 The budget allocated to fuzzing, and hence, the stopping criteria
 of fuzzing is strongly determined by the maximum possible coverage that can
 be obtained~\cite{fell2017review}.
 %
-However, achieving 100\% coverage in software testing is an impossible goal for
-complex real-world programs~\cite{horgan1994achieving}.
-This is due to the increase in input domain and the corresponding
-increase in execution spaces, which makes exhaustive testing
-impossible~\cite{knight1996exhaustive}.
+However, achieving 100\% coverage in complex real-world programs is practically impossible~\cite{horgan1994achieving}. 
+As the input domain and execution space grow, exhaustive testing becomes infeasible~\cite{knight1996exhaustive}.
 
-Yet, quantifying the maximum reachable coverage (also called \emph{maximum reachability})
-remains a challenge, which raises a fundamental question:
-\emph{How close is a fuzzing campaign to achieving its maximum reachable coverage?}
+Yet, quantifying the maximum reachable coverage (also called \emph{maximum reachability}) remains a challenge, raising a fundamental question:
+\emph{How close is a fuzzing campaign to its maximum reachable coverage?}
+
 
 Recent researches have proposed \emph{species richness estimators} from
 biostatistics~\cite{chao2016species} as a principled approach to estimate
 the reachable coverage of a fuzzing campaign~\cite{boehme2018stads}.
-These estimators treat fuzzing as a statistical sampling process in which
-each test input belongs to one or more program execution behaviors,
-for example, reaching a program element, which can then be leveraged to
-estimate the total possible number of such behaviors such as the total
-possible reachable elements in a program~\cite{boehme2018stads}.
+These estimators model fuzzing as a statistical sampling process where
+each test input exercises one or more program behaviors---such as reaching
+a program element---which can then be used to estimate the total number of such behaviors~\cite{boehme2018stads}.
+
 
 However, evaluating the accuracy and reliability
 of these estimators is difficult. The main issue is that, to evaluate such
@@ -350,7 +345,7 @@ fault localization techniques, program repair techniques, and so on.
  %\node[stop] (b4)    {e};
  \node[stop,below=4mm of b3] (b4)    {$Z^e$};
  \begin{scope}[rounded corners,-latex]
-  \path (b2.-40) edge[bend left=50] (b4.40)
+  \path (b2.-40) edge[bend left=50] node[midway,right] {F} (b4.40)
   (b1) edge node [midway,below, xshift=-12pt,yshift=-25pt] {T}(b2)
   (b2) edge (b3);
   \draw (b3.200) -- ++(0,0) -| ([xshift=-5mm]b2.west) |-
@@ -454,19 +449,14 @@ programs, and use this to evaluate maximum reachability estimators.
     the reliability of maximum reachability estimators on 32 real-world programs
     by comparing the estimates under sampling units of diverse granularity.
 
-  % We evaluate this framework on 32 real-world programs and demonstrate that certain estimators yield overlapping confidence intervals and reduced variance across different granularities—indicating estimator reliability.
-    
-% \item \textbf{Assessment of Stopping Criteria:} We re-examine previously proposed stopping criteria and evaluate their effectiveness in identifying when a statistical estimate may serve as a reliable upper bound on maximum reachability.
-
-%\item\textcolor{red}{In this paper we propose a solution to the question of how to interpret the estimate from Chao on time based samples.}
 \end{itemize}
 
-The remainder of this paper is organized as follows. Section~\ref{sec:model} introduces the statistical reachability estimation and evaluation in fuzzing. Section~\ref{sec:method} presents our methodology for assessing the accuracy and reliability of statistical estimators of maximum reachability. Section~\ref{sec:setup} details the experimental setup used to evaluate our approach. Then, Section~\ref{sec:related} discusses the associated related work Finally, Section~\ref{sec:conclusion} concludes the paper and outlines directions for future research.
+The remainder of this paper is organized as follows. Section~\ref{sec:model} introduces the statistical reachability estimation and evaluation in fuzzing. Section~\ref{sec:method} presents our methodology for assessing the accuracy and reliability of statistical estimators of maximum reachability. Section~\ref{sec:setup} details the experimental setup used to evaluate our approach. Then, Section~\ref{sec:related} and Section~\ref{sec:threats} discuss the associated related work and threats to validity. Finally, Section~\ref{sec:conclusion} concludes the paper and outlines directions for future research.
 
 % ---- Model
 %\section{Reachability Estimation in Fuzzing} 
 \section{Preliminaries} \label{sec:model}
-In this section, we first explain the theoretical underpinnings of the reachibility estimation models. 
+In this section, we first explain the theoretical underpinnings of the reachability estimation models. 
 Next, we introduce the context-free grammar, and explain
 the control-flow graphs.
 \subsection{Probabilistic Model for Fuzzing}
@@ -869,10 +859,22 @@ Fuzzle~\cite{lee2022fuzzle} is a benchmark for fuzzer evaluation that is built
 by encoding a sequence of moves in a maze as a chain of function calls. The
 limitation here is that mazes are rarely similar to real world programs.
 They are limited by the moves one can make in a maze. Furthermore, solving
-a maze typically requries finding a single path through a maze.
+a maze typically requires finding a single path through a maze.
 Recursive descent parsers, on the other hand, are real-world programs, and
 are one of the major subjects in practical fuzzing.
 Olympia~\cite{chadt2024olympia} based on Fuzzle generates \emph{solidity contracts} from generated mazes.
+
+\section{Threats to Validity}\label{sec:threats}
+%\todo{Need to fill this up.}
+
+As with any empirical study, our findings on reachable coverage estimation in fuzzing are subject to potential threats to validity.
+
+\emph{\textbf{Internal validity}} concerns the extent to which systematic errors are minimized. A key threat in our study is the establishment of a reliable ground truth for reachability, which is critical for the valid evaluation of estimator performance. Due to the limitations of existing methods for approximating ground truth in fuzzing, we use parsers derived from context-free grammars as benchmarks. These synthetic benchmarks provide exact ground truth reachability, enabling precise evaluation of estimation accuracy in terms of bias and variance. To further mitigate systematic bias from incorrect ground truth, we assess estimator reliability under varying sampling unit definitions within the same fuzzing campaign, without exposing the ground truth during estimation.
+
+\emph{\textbf{External validity}} refers to the extent to which our findings generalize across fuzzers, seed corpora, and subject programs. The use of synthetic parser benchmarks does not compromise complexity, as such non-trivial parsers are widely accepted in fuzzing \cite{lee2022fuzzle} and reflect structural characteristics of real-world programs. We evaluate all estimators using AFL++~\cite{fioraldi2020AFL++}, which aligns with the underlying probabilistic model and represents a widely adopted, state-of-the-art fuzzer derived from the original AFL \cite{zalewski2017american}. Due to the nature of our subjects (i.e. parsers)—we lack well-established seed corpora. Instead, we use a well-formed single input as the initial seed for each subject and perform multiple fuzzing trials, reporting average performance to ensure robustness and generalization of our findings.
+
+\emph{\textbf{Construct validity:}} Given our research objectives, in evaluating reachability estimator performance, it is critical that the chosen evaluation metrics reflect both accuracy and reliability. To ensure measurement validity, we adopt (1) mean bias and variance to assess estimator accuracy, and (2) sensitivity to varying sampling units to assess estimator reliability. These metrics are well-established in prior fuzzing and related statistical estimation research, thereby supporting the appropriateness and validity of our constructs.
+
 
 \section{Conclusion}
 \label{sec:conclusion}
