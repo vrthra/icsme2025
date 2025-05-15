@@ -9,3 +9,8 @@ push:
 
 pull:
 	git pull --rebase overleaf master --autostash
+
+v:
+	vim icsme-registered.tex
+b:
+	vim icsme-registered.bib
