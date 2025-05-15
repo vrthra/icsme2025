@@ -3,7 +3,7 @@
 
 
 % 20th May last date.
-\documentclass[conference]{IEEEtran}
+\documentclass[conference,anonymous,review]{IEEEtran}
 
 \IEEEoverridecommandlockouts
 
@@ -171,34 +171,27 @@ colorlinks=true,linkcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue
 \newcommand{\cmark}{\textcolor{darkgreen}{\ding{51}}}%
 \newcommand{\xmark}{\textcolor{darkred}{\ding{55}}\ }%
 
-%\newcommand{\todo}[1]{\noindent\textcolor{red}{TODO:\xspace #1}}
-%\newcommand{\chk}[1]{\noindent\textcolor{red}{#1\xspace}}
-
-% Section labels
 \def\sectionautorefname{Section}
 \def\subsectionautorefname{Section}
 \def\subsubsectionautorefname{Section}%%
-
-%% Keywords. The author(s) should pick words that accurately describe
-%% the work being presented. Separate the keywords with commas.
 
 \begin{document}
 
 \title{\mytitle}
 
-\author{
-\IEEEauthorblockN{Danushka Liyanage}
-\IEEEauthorblockA{\textit{School of Computer Science} \\
-\textit{University of Sydney}\\
-Sydney, Australia \\
-danushka.liyanage@sydney.edu.au}
-\and 
-\IEEEauthorblockN{Rahul Gopinath}
-\IEEEauthorblockA{\textit{School of Computer Science} \\
-\textit{University of Sydney}\\
-Sydney, Australia \\
-rahul.gopinath@sydney.edu.au}
-}
+% \author{
+% \IEEEauthorblockN{Danushka Liyanage}
+% \IEEEauthorblockA{\textit{School of Computer Science} \\
+% \textit{University of Sydney}\\
+% Sydney, Australia \\
+% danushka.liyanage@sydney.edu.au}
+% \and 
+% \IEEEauthorblockN{Rahul Gopinath}
+% \IEEEauthorblockA{\textit{School of Computer Science} \\
+% \textit{University of Sydney}\\
+% Sydney, Australia \\
+% rahul.gopinath@sydney.edu.au}
+% }
 
 \maketitle
 
@@ -244,14 +237,12 @@ As the input domain and execution space grow, exhaustive testing becomes infeasi
 Yet, quantifying the maximum reachable coverage (also called \emph{maximum reachability}) remains a challenge, raising a fundamental question:
 \emph{How close is a fuzzing campaign to its maximum reachable coverage?}
 
-
 Recent researches have proposed \emph{species richness estimators} from
 biostatistics~\cite{chao2016species} as a principled approach to estimate
 the reachable coverage of a fuzzing campaign~\cite{boehme2018stads}.
 These estimators model fuzzing as a statistical sampling process where
 each test input exercises one or more program behaviors---such as reaching
 a program element---which can then be used to estimate the total number of such behaviors~\cite{boehme2018stads}.
-
 
 However, evaluating the accuracy and reliability
 of these estimators is difficult. The main issue is that, to evaluate such
@@ -291,8 +282,6 @@ tasks that require complex programs such as evaluating fuzzers,
 fault localization techniques, program repair techniques, and so on.
 
 \begin{figure*}
-%    \vspace{-2cm}
-%
 \begin{subfigure}[h]{0.3\textwidth}
 \centering
 %
@@ -350,7 +339,6 @@ fault localization techniques, program repair techniques, and so on.
   (b2) edge (b3);
   \draw (b3.200) -- ++(0,0) -| ([xshift=-5mm]b2.west) |-
   ([yshift=3mm]b2.130) -- (b2.130);
-  %\path (b3.230) edge[bend left=90] (b2);
  \end{scope}
 \end{tikzpicture}
 \caption{Iteration}
@@ -370,15 +358,12 @@ fault localization techniques, program repair techniques, and so on.
  \node[start] (b1)    {$X^{s}$};
  \node[box,below=5mm of b1] (b2)    {Y};
  \node[box,below=5mm of b2] (b3)    {Z};
- %\node[box] (b4)    {C};
  \node[stop,below=5mm of b3] (b4)    {$X^{e}$};
- %\node[stop] (b5)    {e};
  \begin{scope}[rounded corners,-latex]
   \path
   (b1) edge (b2)
   (b2) edge (b3)
   (b3) edge (b4);
-  %(b4) edge (b5);
  \end{scope}
 \end{tikzpicture}
 \caption{Sequence}
@@ -386,22 +371,14 @@ fault localization techniques, program repair techniques, and so on.
 \end{subfigure}
 \vspace{10pt}
 
-
 \begin{subfigure}[h]{0.3\textwidth}
 \begin{grammar}\centering
     <Y> $\rightarrow$ <C> \term{T} <A> | <C> \term{F} <B>
 \end{grammar}
-%\begin{grammar}\centering
-%  <s> $\rightarrow$ <C> <IF>
- % 
- % <IF> $\rightarrow$ <A>
- % \alt <B>
-%\end{grammar}
 \end{subfigure}
 \begin{subfigure}[h]{0.3\textwidth}
 \begin{grammar}\centering
   <Z> $\rightarrow$ <C> \term{T} <B> <Z> | <C> \term{F}
-  %<L> $\rightarrow$ $\epsilon$\phantom{d a b c d f g}
 \end{grammar}
 \end{subfigure}
 \begin{subfigure}[h]{0.3\textwidth}
@@ -413,11 +390,6 @@ fault localization techniques, program repair techniques, and so on.
 \caption{The basic control-flow structures}
 \label{fig:cfg}
 \end{figure*}
-%\begin{figure*}
-%  \includegraphics[width=\textwidth]{basiccfg.pdf}
-%  \caption{Control flow to context-free grammar}
-%  \label{fig:cfg}
-%\end{figure*}
 
 While synthetic benchmarks are a useful alternative, is it possible to use
 real-world programs even if ground-truth (the maximum reachability) is not
@@ -433,12 +405,7 @@ not impact the final estimate. Hence, we propose to evaluate the reliability of
 maximum coverage estimators under varying granularity of sampling interval,
 for the same fuzzing campaign duration.
 
-% To be considered reliable, an estimator should yield consistent point estimates of maximum reachability across different sampling unit definitions, provided the total campaign length is held constant.
-
-% Hence, in this paper, we propose to systematically investigate the reliability
-% of incidence-based statistical estimators for maximum coverage.
-
-\noindent{}\textbf{Contributions.}
+\noindent{}\textbf{Contributions:}
 
 \begin{itemize}
   \item \textbf{Synthetic benchmarks for evaluation:} We propose a novel
@@ -451,15 +418,40 @@ programs, and use this to evaluate maximum reachability estimators.
 
 \end{itemize}
 
-The remainder of this paper is organized as follows. Section~\ref{sec:model} introduces the statistical reachability estimation and evaluation in fuzzing. Section~\ref{sec:method} presents our methodology for assessing the accuracy and reliability of statistical estimators of maximum reachability. Section~\ref{sec:setup} details the experimental setup used to evaluate our approach. Then, Section~\ref{sec:related} and Section~\ref{sec:threats} discuss the associated related work and threats to validity. Finally, Section~\ref{sec:conclusion} concludes the paper and outlines directions for future research.
+The remainder of this paper is organized as follows. Section~\ref{sec:preliminaries} introduces the statistical reachability estimation and evaluation in fuzzing. Section~\ref{sec:method} presents our methodology for assessing the accuracy and reliability of statistical estimators of maximum reachability. Section~\ref{sec:setup} details the experimental setup used to evaluate our approach. Then, Section~\ref{sec:related} and Section~\ref{sec:threats} discuss the associated related work and threats to validity. Finally, Section~\ref{sec:conclusion} concludes the paper and outlines directions for future research.
 
-% ---- Model
-%\section{Reachability Estimation in Fuzzing} 
-\section{Preliminaries} \label{sec:model}
-In this section, we first explain the theoretical underpinnings of the reachability estimation models. 
-Next, we introduce the context-free grammar, and explain
+\section{Preliminaries} \label{sec:preliminaries}
+In this section, we first explain the theoretical underpinnings of the reachability estimation models. Next, we introduce the context-free grammar, and explain
 the control-flow graphs.
-\subsection{Probabilistic Model for Fuzzing}
+\subsection{Computing Maximum Reachability}
+\label{sec:reachability}
+To evaluate fuzzer effectiveness, we need the maximum reachability in a given program, which is often unavailable, and hence need to be approximated. We next discuss the major approaches for approximation.
+
+\noindent\textbf{Non-statistical approaches:} 
+\begin{enumerate}
+    \item \emph{Plateaued Coverage~\cite{boehme2018stads}:} Previous research treated the observed coverage at the end of a fuzzing campaign when coverage plateaued as the ground truth. However, given the exponential difficulty of finding new behaviors~\cite{boehme2021residual}, this approach is unsatisfactory.
+    \item \emph{Small-scale Programs~\cite{liyanage2023reachable}:} For programs with limited behavioral diversity, fuzzers often reach coverage saturation quickly, which can be a source of ground truth. However, they lack the complexity of real-world programs, and are a poor substitute for good benchmarks.
+\end{enumerate}
+    
+\noindent\textbf{Statistical approaches:} 
+\begin{enumerate}
+    \item \emph{Bootstrapping~\cite{liyanage2023reachable}:} 
+    Once coverage stabilizes, bootstrapping/resampling from campaign data can statistically approximate ground truth. However, it relies on assumptions such as independence of inputs, and relative homogeneity of behavioral complexity in unreached regions. 
+    \item\emph{Species richness estimators:} We evaluate all species-richness estimators used by Liyanage et al.~\cite{liyanage2023reachable}. Additionally, inspired by recent studies on estimator performance for estimating maximum mutation score~\cite{Kuznetsov2024empirical}, we incorporate further estimators---including \emph{bootstrap}~\cite{smith1984nonparametric}, \emph{Zelterman}~\cite{bohning2010some}, and others\todo{Fill in all}. While promising, species-richness estimators have similar assumptions as that of bootstrapping, which may not be reasonable in real-world programs.
+\end{enumerate}
+% Prior empirical research on estimating maximum reachable coverage in fuzzing
+% campaigns—under the Bernoulli product model—has shown that statistical
+% estimators systematically underestimate true reachability until near
+% saturation, a phenomenon termed \emph{false peaks}~\cite{liyanage2023reachable}.
+% This negative bias is largely inevitable in early stages due to the
+% insufficiency of fuzzing data and the heterogeneous species diversity,
+% which limits accurate approximation of the species distribution.
+% 
+% Prior research~\cite{liyanage2023reachable} empirically investigated this
+% phenomenon, and suggests that estimators become reliable when the
+% count of doubletons equals or exheeds singletons.
+We next discuss the statistical approaches in detail.
+\subsubsection{Probabilistic Model for Fuzzing}
 The STADS\footnote{STADS—Software Testing As Discovery of Species} framework~\cite{boehme2018stads,boehme2021residual,nguyen2022bedivfuzz,boehme2020boosting} formalizes
 fuzzing as a statistical sampling process $\mathcal{F}$. Each test input is drawn with replacement from the program's input space $\pmb{\mathcal{D}}$. Assuming a sequence of $N$ independent and identically distributed (i.i.d.) random variables are drawn, we formally define the fuzzing campaign $\mathcal{F}$ as:
 
@@ -470,10 +462,8 @@ fuzzing as a statistical sampling process $\mathcal{F}$. Each test input is draw
 The input space $\pmb{\mathcal{D}}$ consists of $S$ (potentially overlapping) subdomains $\{\mathcal{D}_i\}_{i=1}^S$, each representing a distinct \emph{coverage element}. An input $X_n \in \mathcal{F}$ is said to discover a \emph{new} coverage element $\mathcal{D}_i$ if $X_n \in \mathcal{D}_i$ and no earlier input $X_m \in \mathcal{F}$ for $m < n$ has been drawn from $\mathcal{D}_i$—that is, $\mathcal{D}_i$ is being encountered for the first time.
 
 
-\subsection{Bernoulli Product Model}
+\subsubsection{Bernoulli Product Model}
 Since each input in $\mathcal{F}$ may belong to one or more coverage elements, the STADS model represents coverage using \emph{sampling-unit-based incidence data}~\cite{colwell2012models,chao2017thirty}, where a sampling unit aggregates all inputs generated within a fixed time interval. The underlying probabilistic model for this representation is the \emph{Bernoulli product model}. Grouping inputs into sampling units is essential to reduce the overhead of tracking fine-grained coverage information for each individual input during fuzzing.
-
-%This approach eliminates the need to record data for every individual test input in a fuzzing process that generates thousands of inputs per second. Instead, multiple inputs can be grouped into a \emph{sampling unit}.
 
 For each sampling unit, the collected data indicates whether a coverage element
 has been reached. Let $\pi_i$ denote the probability that a sampling unit covers
@@ -503,74 +493,100 @@ The marginal distribution for the incidence-based frequency $Y_i$ for the $i$-th
 
 Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ is the number of elements covered in exactly $k$ sampling units in the data, $k=0,1,\dots,t$. Here, $f_1$ represents the number of \emph{singleton} elements (those that are covered in only one sampling unit), and $f_2$ represents the number of \emph{doubleton} elements (those that are covered in exactly two sampling units). The unobservable zero frequency count $f_0$ denotes the number of coverage elements that are not covered by any of the $t$ sampling units. Then, the number of covered elements in the current campaign is $S(t)=\sum_{i>0}f_i$, and $S(t)+f_0=S$.
 
-%During a fuzzing campaign where we generate enormous amount of test inputs per unit time (at least thousands of inputs within seconds), it is not quite not practical to save the outcome for each input (i.e. the species $\mathcal{D}_i$ that our $X_n$ belongs to) in our data storage. Yet, it is a common practice to write such data at regular intervals. For instance, in our experimentation of 7-day fuzzing campaigns, we record incidence data once in every 15 minutes. Statistically, we can consider all the inputs generated between two consecutive recording instances as a sample of inputs and we indicate the detection/non-detection of species in this sample as a record. 
-%
+\section{Methodology}
+\label{sec:methodology}
+\subsection{Generation of Synthetic Benchmarks}
+\label{sec:synthetic-benchmarks}
 
-%Below we explain the probabilistic model for our fuzzing data. 
-%
-%\subsection{Probabilistic Model for Sampling-Unit-Based Data} \label{sec:probmodel}
-%
-%Assuming that the fuzzer's search space contains $S$ species, indexed by ${1,2,\dots,S}$. Without loss of generality, assume we have sampled $t$ sampling units, indexed by $1,2,\dots,t$, where each sampling unit represents a set of test inputs generated during a certain period of the ongoing fuzzing campaign. A species could be any choice of a program behaviour such as bugs or coverage elements like program paths, branches, or functions. It is assumed that these sampling units are randomly and independently sampled.
+To address the lack of complex benchmarks with known maximum reachability,
+we propose a method for synthesizing large-scale parser programs
+by leveraging the structural isomorphism between control-flow graphs and
+context-free grammars.
+This allows us to generate programs with well-defined control-flow structures
+and known reachability.
+
+\subsubsection{From Control-Flow to Grammar}
+
+A control-flow graph represents the possible execution paths of a program and
+is typically modeled as a directed graph.
+\Cref{fig:cfg} illustrates example control-flow graphs for three procedures:
+\<Y>, \<Z>, and \<X>.
+Each graph consists of a set of nodes $N$, where each node $N_i$ represents
+a program statement\footnote{
+Traditionally, a control-flow node corresponds to a basic block, but for
+the purposes of this work, we treat each node as a single statement without
+loss of generality.}.
+Edges $E_{i,j}$ define possible control transfers such as:
+
+\begin{itemize}
+    \item \textbf{Unconditional}, representing sequential execution;
+    \item \textbf{Conditional}, for branching (e.g., \<if-then-else>);
+    \item \textbf{Loop}, modeling iteration (e.g., \<while> loops);
+    \item \textbf{Call}, connecting to other procedures.
+\end{itemize}
+
+These control-flow structures map naturally to production rules in a context-free grammar. Specifically:
+\begin{itemize}
+    \item Conditionals like \<if C: A else: B> map to  
+      \mbox{\nonterm{IF} \expandsto \nonterm{C} \term{T} \nonterm{A}  $|$ \nonterm{C} \term{F} \nonterm{B}};
+    \item Loops like \<while C: B> map to  
+      \mbox{\nonterm{L} \expandsto \nonterm{C} \nonterm{B} \nonterm{L} $|$ \nonterm{C}};
+    \item Procedure definitions translate to corresponding nonterminals.
+\end{itemize}
+
+This means that the space of all possible context-free grammars covers the space of all structured program control-flows.
+
+\subsubsection{From Grammar to Executable Programs}
+
+Given a context-free grammar, we generate an equivalent recursive-descent parser. Each nonterminal becomes a parser function, and each production rule is implemented as control-flow branches in that function. For example, given the grammar:
+
+%\[
+%\text{\nonterm{E}} \expandsto \text{\nonterm{D} \nonterm{Es}}, \quad \text{\nonterm{Es}} \expandsto \term{+}\text{\nonterm{D} \nonterm{Es}} \mid \epsilon
+%\]
+
+we generate the following parser:
+
+\begin{lstlisting}[style=Python, escapechar=|,numbersep=2pt]
+def parse_E():
+  parse_D()
+  while lookahead() == '+':
+    consume('+')
+    parse_D()
+  return node
+
+def parse_D():
+  token = lookahead()
+  if token and isdigit(token):
+    consume(token)
+  else:
+    raise Error()
+\end{lstlisting}
+
+This parser mirrors the control-flow structure of the original grammar.
+
+\subsubsection{Controlling Program Complexity}
+
+We control the complexity of the generated programs by adjusting grammar parameters such as:
+\begin{itemize}
+    \item The number of nonterminals (corresponding to the number of procedures),
+    \item The number and length of production rules (corresponding to branching complexity),
+    \item The depth and type of recursion (direct, indirect, or linear recursion),
+    \item The inclusion of unreachable nonterminals or dead code to simulate partially unreachable programs.
+\end{itemize}
+
+These parameters allow us to generate large, structured parser programs with thousands of lines of code and complex control-flow structures.
+
+\subsubsection{Ensuring Realism and Difficulty}
+
+To prevent trivial estimation (e.g., estimators that always return 100\%), we introduce unreachable elements by including nonterminals that are not reachable from the start symbol. We may also wrap parser call-sites with guards or inject dead branches.
+
+This methodology produces realistic, large-scale benchmarks that retain structural similarity to real-world parser programs, which are common targets in practical fuzzing campaigns.
 
 
-% ---- End Model
-% --- Estimation
-\subsection{Estimators of Fuzzer Effectiveness and Ground Truth}
-\label{sec:reachability}
-
-\noindent\textbf{Estimators ($\hat{S}$):} We build on prior work by continuing to use all state-of-the-art bio-statistical estimators for fuzzing effectiveness under the Bernoulli product model, as established in~\cite{liyanage2023reachable}. Additionally, inspired by recent studies on estimator performance for killable mutant estimation~\cite{Kuznetsov2024empirical}, we incorporate further estimators—including \emph{bootstrap}~\cite{smith1984nonparametric}, \emph{Zelterman}~\cite{bohning2010some}, and others previously unused in fuzzing—within our modeling framework.
-\vspace{1mm}
-
-\noindent\textbf{Ground Truth ($S$):} A key challenge in evaluating estimators of fuzzing effectiveness is the absence of an absolute ground truth. Existing strategies for approximating ground truth in fuzzing evaluation each have inherent limitations:
-
-\begin{enumerate}
-    \item \emph{\textbf{Plateaued Coverage~\cite{boehme2018stads}:}} It was common practice to treat the observed coverage at the end of a fuzzing campaign as ground truth, particularly when the coverage curve plateaued and showed no further growth. However, this stability may be illusory, as new behaviors can still emerge given more time~\cite{dijkstra2002ewd,boehme2021residual}.
-    
-    \item \emph{\textbf{Small-scale Programs~\cite{liyanage2023reachable}:}} For programs with limited behavioral diversity, fuzzers often reach coverage saturation quickly, making them suitable for ground truth benchmarking. Yet, they poorly reflect the behavioral complexity of real-world programs, where highly skewed behavior distributions—akin to ecological settings with few common and many rare species—can cause overestimation of estimator accuracy.
-    
-    \item \emph{\textbf{Bootstrapping~\cite{liyanage2023reachable}:}} Once coverage stabilizes, bootstrapping/resampling from obtained campaign data enables statistical approximation of ground truth. This relies on the assumption that the empirical distribution closely mirrors the underlying behavior space—an assumption that breaks down when regions that could deviate this distribution remain unreached or input generation is biased.
-\end{enumerate}
-
-
-
-%With the introduction of the STADS statistical framework and the growing adoption of fuzzing, understanding a fuzzer's detection capacity has become increasingly important. As a result, statistical techniques for estimating maximum reachability $\hat{S}$ have gained prominence \cite{boehme2018stads,liyanage2023reachable,boehme2019assurances}. Most estimators of $\hat{S}$ that conform to the probabilistic model in \autoref{sec:model} are introduced to fuzzing from the well-established field of ecological bio-statistics. However, challenges affecting the accuracy and precision of these estimates have been discussed both in the original STADS framework \cite{boehme2018stads} and in more recent evaluations \cite{liyanage2023reachable} of estimator performance. We discuss two critical challenges in more detail that we believe have a significant impact on reachability estimation and its evaluation in fuzzing.
-
-%\subsection{Adaptive bias}
-%A key statistical challenge in greybox fuzzing is \emph{adaptive bias}: as coverage-increasing inputs are added as new seeds, the distribution $\pi_i$ for $i: 1 \leq i \leq S$ evolves throughout the fuzzing campaign \cite{liyanage2021security}. A fundamental assumption of the Bernoulli Product model—common in statistics and machine learning—is that samples are independent and identically distributed (\emph{iid}), meaning the distribution of detection probabilities remains unchanged over time.  
-
-%This assumption holds in blackbox fuzzing campaigns where no new seeds are added to the seed corpus while the fuzzer is running. However, in greybox fuzzing, which is the predominant fuzzing technique today, the outcome of one sample influences subsequent samples, violating the independence assumption \cite{boehme2020boosting,boehme2018stads,liyanage2021security}. Consequently, applying existing statistical estimators to greybox fuzzing leads to \emph{adaptive bias}, where estimates systematically over- or under-estimate the true value in greybox campaigns.
-
-%Therefore, developing novel estimation strategies that correct adaptive bias in statistical estimation of key performance parameters is crucial for assessing greybox fuzzing progress and predicting its future trajectory. Recent advancements have introduced techniques that mitigate adaptive bias to estimate \emph{residual risk} \cite{boehme2021residual} and to extrapolate \emph{coverage rate} \cite{liyanage2024extrapolating} in greybox fuzzing. However, state-of-the-art reachability estimators continue to be affected by adaptive bias.
-
-
-%\subsection{Challenge of Establishing Ground Truth for Evaluation}
-
-%As with other software testing techniques, fuzzing aims to progressively explore diverse program behaviors—such as increasing code coverage or triggering distinct faults—over time. However, a fundamental challenge in evaluating the effectiveness of a fuzzing campaign lies in the absence of an absolute ground truth. Specifically, we can never be certain that all reachable program behaviors have been exercised, regardless of how long the fuzzer runs \cite{dijkstra2002ewd}. There always exists a non-zero probability that previously undiscovered behaviors may emerge as new test inputs are generated \cite{boehme2021residual}.
-
-%Despite this inherent uncertainty, the effectiveness of a fuzzing approach is often evaluated based on its maximum observed reachability within a fixed time or resource budget. For example, widely used benchmarks such as Fuzzbench \cite{metzman2021fuzzbench} and Magma \cite{hazimeh2020magma} assess fuzzers by measuring the coverage achieved after executing for a predetermined duration (e.g., 24 hours in the case of Fuzzbench). However, such evaluations can be misleading in scenarios where novel program behaviors are discovered beyond the allotted time window. This limitation underscores the need for more conclusive and robust quantitative techniques to assess fuzzing effectiveness—particularly methods grounded in data-driven estimation of maximum reachability. Still, establishing the ground truth remains a cornerstone for reliably evaluating such quantitative reachability measures.
-
-%\subsection{Existing Methods in Approximating Ground-Truth for Maximum Reachability}
-
-%Even though achieving a 100\% guarantee of exhausting all possible program behaviors is inherently unattainable, the longer a fuzzing campaign proceeds without encountering new behaviors, the lower the probability of discovering additional ones becomes. This diminishing discovery rate, in turn, increases our confidence in treating the current state as an empirical approximation of the ground truth for maximum reachability. However, recent empirical evidence based on extensive 7-day AFL++ \cite{fioraldi2020AFL++} fuzzing campaigns across 32 real-world C programs demonstrates that reaching a true asymptote in coverage is often elusive in practice \cite{liyanage2023reachable}. While coverage curves may appear to saturate when plotted on a linear scale, this effect is far less discernible on a logarithmic scale—suggesting that new behaviors continue to emerge at a slow but non-negligible rate. This observation further complicates the task of defining and approximating ground truth in fuzzing evaluation. Moreover, the same study highlights the limitations of using static analysis for estimating maximum reachable coverage, revealing both under- and over-approximation in practice. 
-
-%To address this challenge, the current fuzzing literature proposes state-of-the-art strategies to approximate ground-truth reachability, particularly for evaluating statistical estimators of maximum reachability:
-
-%\begin{enumerate}
-%    \item \textbf{Using small-scale programs as subjects:} When the subject program is relatively small and contains only a limited number of distinct reachable behaviors, fuzzers are more likely to achieve saturation within a feasible time frame. This makes such programs suitable proxies for maximum reachability estimator evaluations with ground-truth.
-    
-%    \item \textbf{Bootstrapping from campaign data:} After executing a fuzzer for a sufficiently long period—ideally until the coverage or bug discovery curve exhibits signs of plateauing—bootstrap resampling can be applied to the observed data. The key intuition is that the relationship between the empirical distribution of discovered behaviors and the underlying theoretical population mirrors the relationship between bootstrap samples and the empirical distribution. This method enables statistical approximation of ground-truth reachability without requiring absolute exhaustiveness.
-%\end{enumerate}
-
-%\subsection{Drawbacks of Existing Ground-Truth Approaches}
-
-%Despite efforts to approximate ground truth in fuzzing evaluation, existing methods, particularly those relying on small-scale programs, have significant limitations. While small programs enable faster saturation of program behaviors, they fail to reflect the complexity and diversity of real-world systems, which often exhibit a highly skewed distribution of behaviors—similar to ecological environments with a few abundant behaviors and many rare ones. In contrast, smaller programs tend to have a less skewed distribution of species, leading to an overestimation of fuzzing estimators’ accuracy. This discrepancy results in misleading conclusions when performance estimators derived from small-scale programs are applied to larger, more complex systems, where the species distribution is less predictable. Consequently, the primary drawback of using small-scale programs for ground-truth approximation is the risk of overstating the effectiveness of fuzzing approaches when applied to real-world software.
-
-%In the case of bootstrapping, the core assumption—that the empirical distribution obtained from a fuzzing campaign reasonably approximates the true underlying distribution of all possible program behaviors—fails to satisfy when the campaign has not yet thoroughly explored critical regions of the codebase or when input generation is inherently biased. This assumption further relies on the expectation that the future trajectory of behavior discovery will not significantly deviate from its current trend, implying that species accumulation will smoothly approach saturation. However, without additional quantitative evidence to support the stability of this trajectory—such as statistical indicators of diminishing returns or convergence metrics—such assumptions remain speculative. In the absence of such validation, bootstrapped estimates may result in substantial over- or under-estimations of maximum reachability, ultimately undermining the reliability of fuzzing effectiveness evaluations.  
-
-%These limitations highlight the need for more robust, scalable, and accurate methods of defining and approximating ground truth in fuzzing evaluation, particularly as programs grow in size and complexity.
-
-% --- End Estimation
-\subsection{Control-flow graphs}
+% ----- HERE
+\section{Methodology}
+\subsection{Generation of synthetic benchmarks}
+\subsubsection{Control-flow graphs}
 We generate large programs with complex control flow by leveraging the structural isomorphism between control-flow graphs and context-free grammars. A control-flow graph represents the possible execution paths of a program and is typically modeled as a directed graph. \Cref{fig:cfg} illustrates example control-flow graphs for three procedures: \<Y>, \<Z>, and \<X>.
 
 Each control-flow graph consists of a set of nodes $N$, where each node $N_i$ represents a program statement\footnote{Traditionally, a node corresponds to a basic block, but for the purposes of this work, we treat each node as a single statement without loss of generality.}. Every graph has a unique entry node $P^s$ and exit node $P^e$, with execution proceeding sequentially within the graph. The edges $E_{i,j}$ define the possible transfers of control from node $N_i$ to node $N_j$. When a node has multiple outgoing edges, these edges are labeled to distinguish between different execution paths. For example, in \Cref{tikz:condition}, node \<C> models a conditional statement with two labeled edges: \<T> (true) and \<F> (false).
@@ -584,31 +600,9 @@ We distinguish four types of edges in a control-flow graph:
 \item \textbf{Loop edges:} Represent cycles in the graph, corresponding to loop constructs. For example, in \Cref{tikz:iteration}, the edge from \<B> back to \<C> represents a loop.
 \item \textbf{Call edges:} Represent control transfers to other procedure graphs at call sites.
 \end{itemize}
-By constructing and composing such graphs, we can systematically generate large, structured programs with diverse control-flow behaviors.
+By constructing and composing such graphs, translating them to equivalent parsers, we can systematically generate large, structured programs with diverse control-flow behaviors. We next discuss the details of context-free grammars which are used for constructing parsers.
 
-% \subsection{Example}
-% 
-% For a simple code fragment:
-% 
-% \begin{verbatim}
-% if (x > 0) {
-%     y = x + 1;
-% } else {
-%     y = x - 1;
-% }
-% return y;
-% \end{verbatim}
-% 
-% The corresponding CFG would have:
-% \begin{itemize}
-%     \item A node for the condition \texttt{x > 0}
-%     \item A node for the true branch \texttt{y = x + 1}
-%     \item A node for the false branch \texttt{y = x - 1}
-%     \item A node for \texttt{return y}
-%     \item Edges connecting these nodes according to the control flow
-% \end{itemize}
-
-\subsection{Context-free grammar}
+\subsubsection{Context-free grammar}
 
 A context-free grammar consists of a set of definitions, where each definition corresponds to a \emph{nonterminal} symbol. Each definition contains multiple production rules that specify how the nonterminal can be constructed. The following
 are the components of a context-free grammar.
@@ -625,15 +619,11 @@ are the components of a context-free grammar.
 \end{itemize}
 \Cref{fig:bsearch3} is an example for a context-free grammar.
 
-% left-recursion and right recursion
-
-% --- Methodology
 \section{Methodology} \label{sec:method}
 \begin{figure*} %{r}{7cm} %[12]
   \centering
 \begin{subfigure}[h]{0.45\textwidth} %22 min
   \centering
-%\begin{subfigure}
 \lstset{numbers=left,xleftmargin=2em, numberstyle=\color{lightgray}
 } %frame=single,framexleftmargin=1.5em}
 \begin{lstlisting}[style=Python, escapechar=|,numbersep=2pt]
@@ -676,7 +666,7 @@ def bsearch(x, v, n):
 We next describe our proposed methodology for overcoming the limitations discussed in \Cref{sec:reachability}.
 \subsection{Evaluating Estimators of \texorpdfstring{$S$}{S} Against Accurate Ground Truth}
 To overcome the problem due to non-availability of complex programs with available
-maximum coverage, we propose a novel methodology.
+maximum coverage, we propose the following methodology.
 
 We note that any structured program can be translated into a simpler program
 such that it contains only the following elements:
@@ -714,13 +704,6 @@ grammar, we can generate a recursive-descent parser using these rules:
 (2) Each production rule is implemented in that function.
 (3) Lookahead tokens guide which rule to apply.
 (4) Linear recursion can be replaced with a \<while> loop.
-%Fortunately, there is an easy naswer. Given any non left-recursive context-free
-%grammar, we can generate a recursive-descent parser by using the following rules:
-%(1) Any nonterminal symbol in the grammar is turned into a procedure in the parser.
-%(2) Each production rule is also turned into a procedure in the parser.
-%(3) The particular rule to be used to parse is based on the \emph{lookahead}
-%corresponding to each rule that matches the current symbol.
-%(4) Any linear recursive nonterminal-rule combination is converted into a \texttt{while} loop.
 
 Following in this fashion, we get a parser that directly corresponds to the context-free
 grammar. For example, given the grammar 
@@ -746,18 +729,30 @@ def parse_D():
 which has similar control-flow as a program from which such a grammar may have
 been obtained.
 
+\noindent\textbf{Controlling the complexity.} 
 While generating context-free grammars, we have several mechanisms to
 precisely control the complexity. These include:
-(1) The number of nonterminal symbols in the grammar
-(2) The number of production rules
-(3) The number of alphabets in the language
-(4) The amount of direct and indirect recursion
-(5) The length of individual rules
-(6) The VC dimension of the language.
+\begin{itemize}
+\item The number of nonterminal symbols in the grammar. A grammar with a large number of nonterminal symbols will generate correspondingly larger number of parse procedures.
+\item The number of production rules, and the average length of individual rules. A large number of rules per definition produces correspondingly complex conditional statements that determine which parse procedure to choose. A larger length of individual rules can correspondingly increase the size of individual parsing procedures.
+% \item The number and kind of alphabets in the language. A larger set of alphabets 
+\item The amount of direct, indirect, and linear recursion. One can further increase the complexity of parsing logic by increasing the kind and amount of recursion possible. For example, increasing the amount of linear recursion will increase the number of loops.
+% \item The VC dimension of the language.
+\end{itemize}
+
 These parameters allow us to generate large scale parser programs at will with
 complex control-flows. We can additionally increase the difficulty level by
 adding extra constraints to the generated parser such
 as context-sensitivity.
+
+\noindent\textbf{Constructing unreachable program elements.} When using synthetic
+benchmarks to evaluate maximum reachability, it can be important to ensure that the
+program contains some percentage of unreachable elements (otherwise, any estimator
+that answers 100\% irrespective of the program \emph{wins}). To incorporate such
+unreachable, we simply include nonterminal symbols that are not reachable from the
+start symbol. For more advanced analyzers, wrapping parser procedure call-sites is
+also an option.
+
 
 \noindent\textbf{Scalability and Applicability:} This methodology is designed to generate large-scale C parsers that consist of thousands of lines of code and complex control-flow.
 
@@ -779,34 +774,6 @@ We propose to evaluate whether estimators of maximum reachability $S$ yield
 consistent point estimates with overlapping confidence intervals, while allowing
 for differences in estimation accuracy (i.e., variability) across fuzzing
 campaigns with different sampling unit definitions $r$.
-
-
-% TODO: This should be in the previous section. Not here.
-% Prior empirical research on estimating maximum reachable coverage in fuzzing
-% campaigns—under the Bernoulli product model—has shown that statistical
-% estimators systematically underestimate true reachability until near
-% saturation, a phenomenon termed \emph{false peaks}~\cite{liyanage2023reachable}.
-% This negative bias is largely inevitable in early stages due to the
-% insufficiency of fuzzing data and the heterogeneous species diversity,
-% which limits accurate approximation of the species distribution.
-% 
-% Prior research~\cite{liyanage2023reachable} empirically investigated this
-% phenomenon, and suggests that estimators become reliable when the
-% count of doubletons equals or exheeds singletons.
-
-%  These limitations prompt a critical question: \emph{How can we ensure that statistical estimators provide reliable approximations of maximum reachability $S$ in fuzzing campaigns?}
-% 
-% \result{\textbf{Intuition:} While incidence-based statistical estimators of fuzzing effectiveness are sensitive to the sampling unit size ($r$), a reliable estimator should produce overlapping point estimates for $S$—with varying variance but consistent expectation—when evaluated over equal-length campaigns.}
-% 
-% The incidence frequency counts—particularly singletons ($f_1$) and doubletons ($f_2$)—are sensitive to the granularity of the sampling unit ($r$). Using individual inputs ($r=1$) yields the most fine-grained data, while aggregating inputs (e.g., over time intervals) reduces resolution. Aggregation tends to decrease $f_1$ and increase higher-frequency counts, as rare elements may co-occur within a unit. Since estimators like Chao2 depend directly on $f_1$ and $f_2$, the point estimate of species richness $\hat{S}$ may vary with changes in $r$, even under equal-length campaigns. Despite this sensitivity, the choice of $r$ is often arbitrary; for instance, \cite{liyanage2023reachable} adopts 15-minute intervals without justification.
-% 
-% However, since the maximum reachability $S$ is a finite quantity for any given fuzzing campaign, a reliable estimator should approximate it within reasonable error bounds—despite variability in incidence frequencies introduced by changes in the sampling unit definition—provided that the estimation is performed at the same time point since the campaign's start. Leveraging this property, we evaluate whether estimators of maximum reachability $S$ yield consistent point estimates with overlapping confidence intervals, while allowing for differences in estimation accuracy (i.e., variability) across fuzzing campaigns with different sampling unit definitions $r$.
-
-% \textcolor{red}{Stopping Criterion Evaluation:
-% Evaluate the stopping criterion in checking the reliability of reachability estimators. (Applicable beyond f1 <f2) By evaluating f1 actually becomes an upper bound to f0.
-%}
-% --- End Methodology
-
 
 \section{Experimental Setup}
 \label{sec:setup}
@@ -844,6 +811,7 @@ For our experiments, we use AFL++ \cite{fioraldi2020AFL++}, a widely recognized 
 
 We select a diverse set of real-world C programs from the FuzzBench platform \cite{metzman2021fuzzbench}, which provides a standardized fuzzing benchmarking environment. To ensure comparability with earlier studies (specifically for RQ2), we include all subject programs used in \cite{liyanage2023reachable}, along with several additional targets that are compatible with AFL++ and suitable for large-scale fuzzing.
 
+\section{Evaluation Metrics}
 
 \section{Related Work}
 \label{sec:related}
@@ -864,8 +832,17 @@ Recursive descent parsers, on the other hand, are real-world programs, and
 are one of the major subjects in practical fuzzing.
 Olympia~\cite{chadt2024olympia} based on Fuzzle generates \emph{solidity contracts} from generated mazes.
 
+\section{Future Work}\label{sec:future}
+In this work, we have proposed evaluation of maximum reachability estimators using
+generated programs as subjects.
+
+1. Future work on using generated programs to evaluate fuzzers.
+
+2. Future work on using the framework to train estimators.
+
+3. Stopping criteria evaluation.
+
 \section{Threats to Validity}\label{sec:threats}
-%\todo{Need to fill this up.}
 
 As with any empirical study, our findings on reachable coverage estimation in fuzzing are subject to potential threats to validity.
 
@@ -884,19 +861,9 @@ providing a synthetic benchmark with labeled ground truth, and also by
 using a separate means of checking the reliability of estimators by varying
 the sampling units used.
 
-%\section{Authors and Affiliations}
-
 \balance
 \bibliographystyle{IEEEtran}
 \bibliography{icsme-registered.bib}
 
-
-%\section{Acknowledgments}
-
-%% If your work has an appendix, this is the place to put it.
-%\appendix
-
 \end{document}
 \endinput
-%%
-%% End of file `sample-manuscript.tex'.
