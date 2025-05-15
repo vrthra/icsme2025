@@ -247,11 +247,11 @@ a program element---which can then be used to estimate the total number of such 
 However, evaluating the accuracy and reliability
 of these estimators is difficult. The main issue is that, to evaluate such
 estimators, we need a benchmark of several large complex programs where
-maximum reachability is known. Unfortunately, establishing the maximum
+maximum reachability is known \cite{liyanage2021security}. Unfortunately, establishing the maximum
 reachability is impossible except for trivial programs. Hence, researchers have resorted to using small programs, fuzzed to saturation as an alternative~\cite{liyanage2023reachable}.
-This approach is not ideal as performance of an estimator in small
+This approach is not ideal as the performance of an estimator in small  
 programs may not be representative of the performance of an estimator in complex
-real-world programs.
+real-world programs (such as the benchmarks in Fuzzbench \cite{metzman2021fuzzbench}).
 
 We propose an alternative approach to overcome this difficulty. We note that
 in programs such as parsers (which are one of the major subjects for fuzzing)
@@ -690,7 +690,7 @@ We may also wrap parser call-sites with guards or inject dead branches.
 \subsection{Assessing Reliability of \texorpdfstring{$\hat{S}$}{S-hat} Estimators Without Ground truth}
 To overcome any limitation that may exist due to the synthetic nature of our
 previously proposed benchmark, we propose a second criterion that can be applied
-to real-world benchmarks without relying on availability of ground truth.
+to real-world benchmarks without relying on the availability of ground truth.
 
 Our approach is inspired by the previous research on equivalent mutant
 estimation~\cite{Kuznetsov2024empirical}, which suggests that varying
@@ -727,7 +727,7 @@ classes and test methods as Kuznetsov et al.~\cite{Kuznetsov2024empirical}
 demonstrates. On the other hand, in the case of fuzzing, where there is no
 simple mechanism to identify non-overlapping sampling units, one can use the
 incidence data under various time intervals as
-Liyanage et al.~\cite{liyanage2021security} demonstrates. In both these cases, the
+Liyanage et al.~\cite{liyanage2023reachable} demonstrates. In both these cases, the
 sampling units can be varied. In particular, Liyanage et al. chose 15~minutes
 as the time interval for sampling unit. However, it can be asked if a time
 interval of 5 minutes or even 60 minutes would have similar estimates.
@@ -740,9 +740,31 @@ $S$ sensitive to changes in the sampling unit size $r$?
 
 For our experiments, we use AFL++ \cite{fioraldi2020AFL++}, a widely recognized state-of-the-art greybox fuzzer known for its performance and extensive adoption in recent research, particularly in reachability estimation studies. Using the same fuzzer as prior work enables direct and fair comparisons when evaluating estimator performance (RQ2).
 
-We select a diverse set of real-world C programs from the FuzzBench platform \cite{metzman2021fuzzbench}, which provides a standardized fuzzing benchmarking environment. To ensure comparability with earlier studies (specifically for RQ2), we include all subject programs used in \cite{liyanage2023reachable}, along with several additional targets that are compatible with AFL++ and suitable for large-scale fuzzing.
+As detailed in Section~\ref{sec:method}, we select a diverse set of large C parsers with known ground truth as our fuzzing benchmarks. We ensure that these targets are compatible with AFL++ and suitable for large-scale fuzzing experiments. \todo{Indicate the specific number of subjects/parsers etc.}
 
-\section{Evaluation Metrics}
+\subsection{Evaluation Metrics}
+To assess the performance of statistical estimators of maximum reachability, we adopt
+the following metrics, covering both accuracy and reliability.
+\begin{enumerate}
+\item \textbf{Point estimate bias.} We define the bias as the difference between the estimator's
+point estimate $\hat{S}$ and the known ground truth $S$ available from the synthetic benchmark.
+Formally,
+\begin{equation}
+\text{Bias} = \hat{S} - S
+\end{equation}
+A smaller absolute bias indicates better estimate accuracy. We will report the mean bias over
+multiple runs.
+\item \textbf{Confidence interval coverage.} When estimators provide confidence intervals, we will evaluate their coverage by checking whether the true $S$ lies within the specified interval. We will report the proportion of CIs containing the true $S$.
+\item \textbf{Variance across multiple runs.} Variance quantifies the stability of the
+estimator across multiple fuzzing campaigns. For each estimator, we will report the variance
+of $\hat{S}$ over repeated trials. Low variance indicates greater stability and robustness of the estimation.
+\item\textbf{Sampling unit sensitivity.} We will consider an estimator reliable if its
+point estimates across different time intervals have overlapping confidence intervals, and
+no significant shifts in mean estimates. We will use Welch's t-test to test whether the 
+observations are significantly different. A reliable estimator should result in no significant
+differences.
+\end{enumerate}
+
 
 \section{Related Work}
 \label{sec:related}
