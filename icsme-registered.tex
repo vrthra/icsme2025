@@ -461,123 +461,7 @@ fuzzing as a statistical sampling process $\mathcal{F}$. Each test input is draw
 
 The input space $\pmb{\mathcal{D}}$ consists of $S$ (potentially overlapping) subdomains $\{\mathcal{D}_i\}_{i=1}^S$, each representing a distinct \emph{coverage element}. An input $X_n \in \mathcal{F}$ is said to discover a \emph{new} coverage element $\mathcal{D}_i$ if $X_n \in \mathcal{D}_i$ and no earlier input $X_m \in \mathcal{F}$ for $m < n$ has been drawn from $\mathcal{D}_i$—that is, $\mathcal{D}_i$ is being encountered for the first time.
 
-
-\subsubsection{Bernoulli Product Model}
-Since each input in $\mathcal{F}$ may belong to one or more coverage elements, the STADS model represents coverage using \emph{sampling-unit-based incidence data}~\cite{colwell2012models,chao2017thirty}, where a sampling unit aggregates all inputs generated within a fixed time interval. The underlying probabilistic model for this representation is the \emph{Bernoulli product model}. Grouping inputs into sampling units is essential to reduce the overhead of tracking fine-grained coverage information for each individual input during fuzzing.
-
-For each sampling unit, the collected data indicates whether a coverage element
-has been reached. Let $\pi_i$ denote the probability that a sampling unit covers
-element $\mathcal{D}_i$, assuming $\pi_i$ remains constant across all randomly
-selected sampling units.
-In general, the sum of all $\pi_i$ values does \emph{not} equal unity.
-
-During a fuzzing campaign, suppose we record $t$ sampling units. The incidence data forms an element$\times$sampling-unit incidence matrix ${W_{ij};i=1,2,\dots,S,j=1,2,\dots,t}$ with $S$ rows and $t$ columns, where $W_{ij} = 1$ if element $i$ is covered in sampling unit $j$, and $W_{ij} = 0$ otherwise.
-
-The incidence frequency $Y_i$ represents the number of sampling units in which element $\mathcal{D}_i$ is covered; i.e., $Y_i=\sum_{j=1}^{t}W_{ij}$. A coverage element $\mathcal{D}_i$ that has not been covered by any sampling unit will have an incidence frequency of zero; i.e., $Y_i=0$.
-
-Given the set of detection probabilities $(\pi_1,\pi_2,\dots,\pi_S)$, we assume each element $W_{ij}$ in the incidence matrix follows a Bernoulli distribution with probability $\pi_i$. The probability distribution for the incidence matrix is:
-
-\begin{equation}
-    \begin{split}
-        P(W_{ij}=w_{ij};i=1,2,\dots,S,j=1,2,\dots,t) \\
-        = \prod_{j=1}^{t}\prod_{i=1}^{S}\pi_i^{w_{ij}}(1-\pi_i)^{1-w_{ij}} \\
-        = \prod_{i=1}^{S}\pi_i^{y_i}(1-\pi_i)^{t-y_i}.
-    \end{split}
-\end{equation}
-
-The marginal distribution for the incidence-based frequency $Y_i$ for the $i$-th coverage element follows a binomial distribution characterized by $t$ and the detection probability $\pi_i$:
-
-\begin{equation}
-    P(Y_i=y_i) = \binom{t}{y_i}\pi_i^{y_i}(1-\pi_i)^{t-y_i}, \qquad i=1,2,\dots,S.
-\end{equation}
-
-Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ is the number of elements covered in exactly $k$ sampling units in the data, $k=0,1,\dots,t$. Here, $f_1$ represents the number of \emph{singleton} elements (those that are covered in only one sampling unit), and $f_2$ represents the number of \emph{doubleton} elements (those that are covered in exactly two sampling units). The unobservable zero frequency count $f_0$ denotes the number of coverage elements that are not covered by any of the $t$ sampling units. Then, the number of covered elements in the current campaign is $S(t)=\sum_{i>0}f_i$, and $S(t)+f_0=S$.
-
-\section{Methodology} \label{sec:method}
-\subsection{Generation of synthetic benchmarks}
-We generate large programs with complex control flow by leveraging the
-structural isomorphism between control-flow graphs and context-free grammars.
-
-\noindent\textbf{Primer on Context-Free Grammars.}
-A context-free grammar (also called a \emph{grammar})
-is a formal system for defining a language. The following is a simple grammar:
-\begin{grammar}\centering
-<E> $\rightarrow$ <T> \term{+} <E> $\mid$ <T>
-
-<T> $\rightarrow$ \term{0} $\mid$ \term{1} \phantom{a} \phantom{a} \phantom{a} \phantom{a}
-\end{grammar}
-
-The alphabets of the language are called \emph{terminal symbols}. In the above \term{0} is
-a terminal symbol.
-The grammar also contains \emph{nonterminal symbols} which are named
-constructs that can be expanded into other terminal or nonterminal
-symbols (e.g., \nonterm{E} in the above).
-
-How the nonterminal symbols are expanded into other symbols is defined
-by a set of \emph{production rules}, which together form the definition of that
-nonterminal symbol. In the above example, the definition of the nonterminal \nonterm{E} is given
-by
-\mbox{\nonterm{E} \expandsto \nonterm{T} \term{+} \nonterm{E} $\mid$ \nonterm{T}} which
-contains two rules for expanding \nonterm{E}.
-
-\subsubsection{From Control-Flow to Grammar}
-A control-flow graph represents the possible execution paths of a program and is
-typically modeled as a directed graph.
-\Cref{fig:cfg} illustrates example control-flow graphs for three procedures:
-\<Y>, \<Z>, and \<X>.
-Each graph consists of a set of nodes $N$, where each node $N_i$ represents a
-program statement\footnote{Traditionally, a node corresponds to a basic block, but for the purposes of this work, we treat each node as a single statement without loss of generality.}.
-Edges $E_{i,j}$ define possible control transfers, including:
-\begin{itemize}
-    \item \textbf{Sequential}, representing sequential execution;
-    \item \textbf{Conditional}, for branching (e.g., \<if-then-else>);
-    \item \textbf{Loop}, modeling iteration (e.g., \<while> loops);
-    \item \textbf{Call}, connecting to other procedures.
-\end{itemize}
-
-These control-flow structures map naturally to production rules in a
-context-free grammar. Specifically:
-\begin{itemize}
-    \item Conditionals such as \<if C: A else: B> map to
-      \mbox{\nonterm{IF} \expandsto \nonterm{C} \term{T} \nonterm{A}  $|$ \nonterm{C} \term{F} \nonterm{B}};
-    \item Loops such as \<while C: B> map to
-      \mbox{\nonterm{L} \expandsto \nonterm{C} \nonterm{B} \nonterm{L} $|$ \nonterm{C}};
-    \item Procedure definitions translate to corresponding nonterminals.
-\end{itemize}
-
-This means that the space of all possible context-free grammars covers the space
-of all structured program control-flows.
-
-\subsubsection{From Grammar to Executable Programs}
-
-Given a context-free grammar, we generate an equivalent
-recursive-descent parser.
-Each nonterminal becomes a parser function, and each production rule is
-implemented as control-flow branches in that function. For example, given the grammar:
-
-\nonterm{E}\expandsto \nonterm{D} \nonterm{Es};
-\nonterm{Es}\expandsto \term{+}\nonterm{D}\nonterm{Es}$|$ $\epsilon$, we can translate
-
-we generate the following parser:
-
-\begin{lstlisting}[style=Python, escapechar=|,numbersep=2pt]
-def parse_E():
-  parse_D()
-  while lookahead() == '+':
-    consume('+')
-    parse_D()
-  return
-
-def parse_D():
-  token = lookahead()
-  if token and isdigit(token):
-    consume(token)
-  else:
-    raise Error()
-\end{lstlisting}
-
-This parser mirrors the control-flow structure of the original grammar.
-\begin{figure*} %{r}{7cm} %[12]
+\begin{figure*}[ht] %{r}{7cm} %[12]
   \centering
 \begin{subfigure}[h]{0.45\textwidth} %22 min
   \centering
@@ -614,12 +498,168 @@ def bsearch(x, v, n):
   <if.8> $\rightarrow$ \term{T} \term{l.9}
    \alt \term{F} \term{l.11}
 \end{grammar}
-\caption{\<bsearch> control-flow grammar}
+\caption{\<bsearch> control-flow equivalent grammar}
 \label{fig:bsearch3}
 \end{subfigure}
-\caption{Extracting the context-free grammar for \<bsearch>}
+\caption{Equivalent context-free grammar for \<bsearch> program control-flow}
 \label{fig:bsearch}
 \end{figure*}
+
+\subsubsection{Bernoulli Product Model}
+Since each input in $\mathcal{F}$ may belong to one or more coverage elements, the STADS model represents coverage using \emph{sampling-unit-based incidence data}~\cite{colwell2012models,chao2017thirty}, where a sampling unit aggregates all inputs generated within a fixed time interval. The underlying probabilistic model for this representation is the \emph{Bernoulli product model}. Grouping inputs into sampling units is essential to reduce the overhead of tracking fine-grained coverage information for each individual input during fuzzing.
+
+For each sampling unit, the collected data indicates whether a coverage element
+has been reached. Let $\pi_i$ denote the probability that a sampling unit covers
+element $\mathcal{D}_i$, assuming $\pi_i$ remains constant across all randomly
+selected sampling units.
+In general, the sum of all $\pi_i$ values does \emph{not} equal unity.
+
+During a fuzzing campaign, suppose we record $t$ sampling units. The incidence data forms an element$\times$sampling-unit incidence matrix ${W_{ij};i=1,2,\dots,S,j=1,2,\dots,t}$ with $S$ rows and $t$ columns, where $W_{ij} = 1$ if element $i$ is covered in sampling unit $j$, and $W_{ij} = 0$ otherwise.
+
+The incidence frequency $Y_i$ represents the number of sampling units in which element $\mathcal{D}_i$ is covered; i.e., $Y_i=\sum_{j=1}^{t}W_{ij}$. A coverage element $\mathcal{D}_i$ that has not been covered by any sampling unit will have an incidence frequency of zero; i.e., $Y_i=0$.
+
+Given the set of detection probabilities $(\pi_1,\pi_2,\dots,\pi_S)$, we assume each element $W_{ij}$ in the incidence matrix follows a Bernoulli distribution with probability $\pi_i$. The probability distribution for the incidence matrix is:
+
+\begin{equation}
+    \begin{split}
+        P(W_{ij}=w_{ij};i=1,2,\dots,S,j=1,2,\dots,t) \\
+        = \prod_{j=1}^{t}\prod_{i=1}^{S}\pi_i^{w_{ij}}(1-\pi_i)^{1-w_{ij}} \\
+        = \prod_{i=1}^{S}\pi_i^{y_i}(1-\pi_i)^{t-y_i}.
+    \end{split}
+\end{equation}
+
+The marginal distribution for the incidence-based frequency $Y_i$ for the $i$-th coverage element follows a binomial distribution characterized by $t$ and the detection probability $\pi_i$:
+
+\begin{equation}
+    P(Y_i=y_i) = \binom{t}{y_i}\pi_i^{y_i}(1-\pi_i)^{t-y_i}, \qquad i=1,2,\dots,S.
+\end{equation}
+
+Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ is the number of elements covered in exactly $k$ sampling units in the data, $k=0,1,\dots,t$. Here, $f_1$ represents the number of \emph{singleton} elements (those that are covered in only one sampling unit), and $f_2$ represents the number of \emph{doubleton} elements (those that are covered in exactly two sampling units). The unobservable zero frequency count $f_0$ denotes the number of coverage elements that are not covered by any of the $t$ sampling units. Then, the number of covered elements in the current campaign is $S(t)=\sum_{i>0}f_i$, and $S(t)+f_0=S$.
+
+\section{Methodology} \label{sec:method}
+We next describe our methodology for generation of synthetic benchmarks.
+Since the maximum reachability in these programs are controlled, we will use
+these programs to evaluate the reliability of estimators.
+\subsection{Synthetic Benchmarks With Known Reachability}
+We generate large programs with complex control flow by leveraging the
+structural isomorphism between control-flow graphs and context-free grammars.
+
+\noindent\textbf{Primer on Context-Free Grammars.}
+A context-free grammar (also called a \emph{grammar})
+is a formal system for defining a language. The following is a simple grammar:
+\begin{grammar}\centering
+<E> $\rightarrow$ <T> \term{+} <E> $\mid$ <T>
+
+<T> $\rightarrow$ \term{0} $\mid$ \term{1} \phantom{a} \phantom{a} \phantom{a} \phantom{a}
+\end{grammar}
+
+The alphabets of the language are called \emph{terminal symbols}. In the above \term{0} is
+a terminal symbol.
+The grammar also contains \emph{nonterminal symbols} which are named
+constructs that can be expanded into other terminal or nonterminal
+symbols (e.g., \nonterm{E} in the above).
+
+How the nonterminal symbols are expanded into other symbols is defined
+by a set of \emph{production rules}, which together form the definition of that
+nonterminal symbol. In the above example, the definition of the nonterminal \nonterm{E} is given
+by
+\mbox{\nonterm{E} \expandsto \nonterm{T} \term{+} \nonterm{E} $\mid$ \nonterm{T}} which
+contains two rules for expanding \nonterm{E}.
+
+\noindent\textbf{From Control-Flow to Grammar.}
+A control-flow graph represents the possible execution paths of a program and is
+typically modeled as a directed graph.
+\Cref{fig:cfg} illustrates example control-flow graphs for three procedures:
+\<Y>, \<Z>, and \<X>.
+Each graph consists of a set of nodes $N$, where each node $N_i$ represents a
+program statement\footnote{Traditionally, a node corresponds to a basic block,
+but for the purposes of this work, we treat each node as a single statement without loss of generality.}.
+Edges $E_{i,j}$ define possible control transfers, including:
+\begin{itemize}
+    \item \textbf{Sequential}, representing sequential execution;
+    \item \textbf{Conditional}, for branching (e.g., \<if-then-else>);
+    \item \textbf{Loop}, modeling iteration (e.g., \<while> loops);
+    \item \textbf{Call}, connecting to other procedures.
+\end{itemize}
+
+These control-flow structures map naturally to production rules in a
+context-free grammar. Specifically:
+\begin{itemize}
+    \item Conditionals such as \<if C: A else: B> map to
+      \mbox{\nonterm{IF} \expandsto \nonterm{C} \term{T} \nonterm{A}  $|$ \nonterm{C} \term{F} \nonterm{B}};
+    \item Loops such as \<while C: B> map to
+      \mbox{\nonterm{L} \expandsto \nonterm{C} \nonterm{B} \nonterm{L} $|$ \nonterm{C}};
+    \item Procedure definitions translate to corresponding nonterminals.
+\end{itemize}
+\Cref{fig:bsearch} shows the equivalent context-free grammar from a given
+program.
+
+This means that the space of all possible context-free grammars covers the space
+of all structured program control-flows.
+
+\noindent\textbf{From Grammar to Executable Programs.}
+Given any non-left-recursive context-free
+grammar, we can generate a recursive-descent parser using these rules:
+\begin{itemize}
+  \item Each nonterminal becomes a function. For example, \nonterm{E} is translated to \<def parse\_E>.
+  \item Each production rule is implemented in that function.
+  \item Lookahead tokens guide which rule to apply.
+  \item Linear recursion can be replaced with a \<while> loop.
+\end{itemize}
+
+Following in this fashion, we get a parser that directly corresponds to the context-free
+grammar. For example, given the grammar
+\nonterm{E}\expandsto \nonterm{D} \nonterm{Es};
+\nonterm{Es}\expandsto \term{+}\nonterm{D}\nonterm{Es}$|$ $\epsilon$, we can translate
+this to:
+\begin{lstlisting}[style=Python, escapechar=|,numbersep=2pt]
+def parse_E():
+  parse_D()
+
+  while lookahead() == '+':
+    consume('+')
+    parse_D()
+  return node
+
+def parse_D():
+  token = lookahead()
+  if token and isdigit(token):
+    consume(token)
+  else:
+    raise Error()
+\end{lstlisting}
+which has similar control-flow as a program from which such a grammar may have
+been obtained.
+
+
+% Each nonterminal becomes a parser function, and each production rule is
+% implemented as control-flow branches in that function. For example, given the grammar:
+% 
+% \begin{grammar}\centering
+%   <E> $\rightarrow$ <D> <Es>\phantom{a}\phantom{a}\phantom{a}\phantom{a}\phantom{a}\phantom{a}\phantom{a}\phantom{a}\phantom{a}
+% 
+% <Es> $\rightarrow$ \term{+} <D> <Es> $\mid$ $\epsilon$
+% \end{grammar}
+% 
+% we generate the following parser:
+% 
+% \begin{lstlisting}[style=Python, escapechar=|,numbersep=2pt]
+% def parse_E():
+%   parse_D()
+%   while lookahead() == '+':
+%     consume('+')
+%     parse_D()
+%   return
+% 
+% def parse_D():
+%   token = lookahead()
+%   if token and isdigit(token):
+%     consume(token)
+%   else:
+%     raise Error()
+% \end{lstlisting}
+% 
+% This parser mirrors the control-flow structure of the original grammar.
 
 \noindent\textbf{Controlling the program complexity.}
 While generating context-free grammars, we have several mechanisms to
