@@ -840,9 +840,23 @@ The following research question will be investigating each of these points.
 \noindent\textbf{RQ1:} How accurate are the estimators of maximum reachability
 in terms of the point estimate as well as the confidence intervals?
 
+The second question that we want to be answered is regarding the reliability
+of the sampling units used in species richness based statistical estimators for
+maximum reachability. We note that there are several methods for formulating
+the problem of maximum reachability as a species richness estimate. For example,
+if one is using traditional test cases, the sampling unit can be the test
+classes and test methods as Kuznetsov et al.~\cite{Kuznetsov2024empirical}
+demonstrates. On the other hand, in the case of fuzzing, where there is no
+simple mechanism to identify non-overlapping sampling units, one can use the
+incidence data under various time intervals as
+Liyanage et al.~\cite{liyanage2021security} demonstrates. In both these cases, the
+sampling units can be varied. In particular, Liyanage et al. chose 15~minutes
+as the time interval for sampling unit. However, it can be asked if a time
+interval of 5 minutes or even 60 minutes would have similar estimates.
+The following research question will investigate this question.
 
-
-\noindent\textbf{RQ2:} To what extent are the estimates of maximum reachability $S$ sensitive to changes in the sampling unit size $r$?
+\noindent\textbf{RQ2:} To what extent are the estimates of maximum reachability
+$S$ sensitive to changes in the sampling unit size $r$?
 
 \subsection{Fuzzers and Subject Programs}
 
