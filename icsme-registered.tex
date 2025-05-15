@@ -493,7 +493,7 @@ The marginal distribution for the incidence-based frequency $Y_i$ for the $i$-th
 
 Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ is the number of elements covered in exactly $k$ sampling units in the data, $k=0,1,\dots,t$. Here, $f_1$ represents the number of \emph{singleton} elements (those that are covered in only one sampling unit), and $f_2$ represents the number of \emph{doubleton} elements (those that are covered in exactly two sampling units). The unobservable zero frequency count $f_0$ denotes the number of coverage elements that are not covered by any of the $t$ sampling units. Then, the number of covered elements in the current campaign is $S(t)=\sum_{i>0}f_i$, and $S(t)+f_0=S$.
 
-
+\section{Methodology} \label{sec:method}
 \subsection{Generation of synthetic benchmarks}
 \subsubsection{Control-flow graphs}
 We generate large programs with complex control flow by leveraging the structural isomorphism between control-flow graphs and context-free grammars. A control-flow graph represents the possible execution paths of a program and is typically modeled as a directed graph. \Cref{fig:cfg} illustrates example control-flow graphs for three procedures: \<Y>, \<Z>, and \<X>.
@@ -528,7 +528,8 @@ are the components of a context-free grammar.
 \end{itemize}
 \Cref{fig:bsearch3} is an example for a context-free grammar.
 
-\section{Methodology} \label{sec:method}
+
+
 \begin{figure*} %{r}{7cm} %[12]
   \centering
 \begin{subfigure}[h]{0.45\textwidth} %22 min
