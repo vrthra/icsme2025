@@ -495,41 +495,88 @@ Denote the incidence frequency counts by $(f_0, f_1, \dots, f_t)$, where $f_k$ i
 
 \section{Methodology} \label{sec:method}
 \subsection{Generation of synthetic benchmarks}
-\subsubsection{Control-flow graphs}
-We generate large programs with complex control flow by leveraging the structural isomorphism between control-flow graphs and context-free grammars. A control-flow graph represents the possible execution paths of a program and is typically modeled as a directed graph. \Cref{fig:cfg} illustrates example control-flow graphs for three procedures: \<Y>, \<Z>, and \<X>.
+We generate large programs with complex control flow by leveraging the
+structural isomorphism between control-flow graphs and context-free grammars.
 
-Each control-flow graph consists of a set of nodes $N$, where each node $N_i$ represents a program statement\footnote{Traditionally, a node corresponds to a basic block, but for the purposes of this work, we treat each node as a single statement without loss of generality.}. Every graph has a unique entry node $P^s$ and exit node $P^e$, with execution proceeding sequentially within the graph. The edges $E_{i,j}$ define the possible transfers of control from node $N_i$ to node $N_j$. When a node has multiple outgoing edges, these edges are labeled to distinguish between different execution paths. For example, in \Cref{tikz:condition}, node \<C> models a conditional statement with two labeled edges: \<T> (true) and \<F> (false).
+\noindent\textbf{Primer on Context-Free Grammars.}
+A context-free grammar (also called a \emph{grammar})
+is a formal system for defining a language. The following is a simple grammar:
+\begin{grammar}\centering
+<E> $\rightarrow$ <T> \term{+} <E> $\mid$ <T>
 
-Individual procedures have their own control-flow graphs, which are connected to other graphs at their call sites via call edges. These connections are denoted by labeling nodes with the name of the called procedure. For instance, in \Cref{tikz:sequence}, the control-flow graph of procedure \<X> includes nodes \<Y> and \<Z>, which represent calls to the corresponding procedures.
+<T> $\rightarrow$ \term{0} $\mid$ \term{1} \phantom{a} \phantom{a} \phantom{a} \phantom{a}
+\end{grammar}
 
-We distinguish four types of edges in a control-flow graph:
+The alphabets of the language are called \emph{terminal symbols}. In the above \term{0} is
+a terminal symbol.
+The grammar also contains \emph{nonterminal symbols} which are named
+constructs that can be expanded into other terminal or nonterminal
+symbols (e.g., \nonterm{E} in the above).
+
+How the nonterminal symbols are expanded into other symbols is defined
+by a set of \emph{production rules}, which together form the definition of that
+nonterminal symbol. In the above example, the definition of the nonterminal \nonterm{E} is given
+by
+\mbox{\nonterm{E} \expandsto \nonterm{T} \term{+} \nonterm{E} $\mid$ \nonterm{T}} which
+contains two rules for expanding \nonterm{E}.
+
+\subsubsection{From Control-Flow to Grammar}
+A control-flow graph represents the possible execution paths of a program and is
+typically modeled as a directed graph.
+\Cref{fig:cfg} illustrates example control-flow graphs for three procedures:
+\<Y>, \<Z>, and \<X>.
+Each graph consists of a set of nodes $N$, where each node $N_i$ represents a
+program statement\footnote{Traditionally, a node corresponds to a basic block, but for the purposes of this work, we treat each node as a single statement without loss of generality.}.
+Edges $E_{i,j}$ define possible control transfers, including:
 \begin{itemize}
-\item \textbf{Unconditional edges:} Represent sequential execution without branching. For example, all edges in \Cref{tikz:sequence} are unconditional.
-\item \textbf{Conditional edges:} Represent branching decisions, such as in \<if-then-else> constructs. These edges are labeled, as seen in \Cref{tikz:condition}, where node \<C> branches to \<T> or \<F>.
-\item \textbf{Loop edges:} Represent cycles in the graph, corresponding to loop constructs. For example, in \Cref{tikz:iteration}, the edge from \<B> back to \<C> represents a loop.
-\item \textbf{Call edges:} Represent control transfers to other procedure graphs at call sites.
+    \item \textbf{Sequential}, representing sequential execution;
+    \item \textbf{Conditional}, for branching (e.g., \<if-then-else>);
+    \item \textbf{Loop}, modeling iteration (e.g., \<while> loops);
+    \item \textbf{Call}, connecting to other procedures.
 \end{itemize}
-By constructing and composing such graphs, translating them to equivalent parsers, we can systematically generate large, structured programs with diverse control-flow behaviors. We next discuss the details of context-free grammars which are used for constructing parsers.
 
-\subsubsection{Context-free grammar}
-
-A context-free grammar consists of a set of definitions, where each definition corresponds to a \emph{nonterminal} symbol. Each definition contains multiple production rules that specify how the nonterminal can be constructed. The following
-are the components of a context-free grammar.
-
+These control-flow structures map naturally to production rules in a
+context-free grammar. Specifically:
 \begin{itemize}
-    \item \textbf{Nonterminal symbols}: Named syntactic variables that represent phrase structures in the language. In \Cref{fig:cfg}, symbols such as \nonterm{C} are nonterminals.
-    \item \textbf{Terminal symbols}: The actual vocabulary of the language being defined. In \Cref{fig:cfg}, symbols such as \term{T} are terminals.
-    \item \textbf{Definitions}: Each nonterminal symbol has a definition consisting of one or more alternative production rules. These alternatives represent the different ways the nonterminal can be constructed. In \Cref{fig:cfg}, 
-    \mbox{\nonterm{Y} \expandsto \nonterm{C} \term{T} \nonterm{A} $|$ \nonterm{C} \term{F} \nonterm{B}}
-    is a definition for \nonterm{Y} with two alternative production rules. 
-    \item \textbf{Production rules}: Each rule specifies a possible form for the nonterminal on the left-hand side. A rule consists of a sequence of terminals and nonterminals that can replace the left-hand nonterminal in a derivation.
-    In \Cref{fig:cfg}, 
-    \mbox{\nonterm{Y} \expandsto \nonterm{C} \term{T} \nonterm{A}} is one of the production rules for \nonterm{Y}, the other being \mbox{\nonterm{Y} \expandsto \nonterm{C} \term{F} \nonterm{B}}.
+    \item Conditionals such as \<if C: A else: B> map to
+      \mbox{\nonterm{IF} \expandsto \nonterm{C} \term{T} \nonterm{A}  $|$ \nonterm{C} \term{F} \nonterm{B}};
+    \item Loops such as \<while C: B> map to
+      \mbox{\nonterm{L} \expandsto \nonterm{C} \nonterm{B} \nonterm{L} $|$ \nonterm{C}};
+    \item Procedure definitions translate to corresponding nonterminals.
 \end{itemize}
-\Cref{fig:bsearch3} is an example for a context-free grammar.
 
+This means that the space of all possible context-free grammars covers the space
+of all structured program control-flows.
 
+\subsubsection{From Grammar to Executable Programs}
 
+Given a context-free grammar, we generate an equivalent
+recursive-descent parser.
+Each nonterminal becomes a parser function, and each production rule is
+implemented as control-flow branches in that function. For example, given the grammar:
+
+\nonterm{E}\expandsto \nonterm{D} \nonterm{Es};
+\nonterm{Es}\expandsto \term{+}\nonterm{D}\nonterm{Es}$|$ $\epsilon$, we can translate
+
+we generate the following parser:
+
+\begin{lstlisting}[style=Python, escapechar=|,numbersep=2pt]
+def parse_E():
+  parse_D()
+  while lookahead() == '+':
+    consume('+')
+    parse_D()
+  return
+
+def parse_D():
+  token = lookahead()
+  if token and isdigit(token):
+    consume(token)
+  else:
+    raise Error()
+\end{lstlisting}
+
+This parser mirrors the control-flow structure of the original grammar.
 \begin{figure*} %{r}{7cm} %[12]
   \centering
 \begin{subfigure}[h]{0.45\textwidth} %22 min
@@ -573,98 +620,29 @@ def bsearch(x, v, n):
 \caption{Extracting the context-free grammar for \<bsearch>}
 \label{fig:bsearch}
 \end{figure*}
-We next describe our proposed methodology for overcoming the limitations discussed in \Cref{sec:reachability}.
-\subsection{Evaluating Estimators of \texorpdfstring{$S$}{S} Against Accurate Ground Truth}
-To overcome the problem due to non-availability of complex programs with available
-maximum coverage, we propose the following methodology.
 
-We note that any structured program can be translated into a simpler program
-such that it contains only the following elements:
-(1) sequence of statements
-(2) if-then-else conditionals
-(3) \<while> loops
-(4) procedure calls.
-Next, given such a simplified form and its control-flow,
-we can leverage the following rules to convert the control-flow to the context-free grammar~(\Cref{fig:cfg}).
-That is,
-(1) for any conditional \<if C: A else: B>, translate to
-  \mbox{\nonterm{IF} \expandsto \nonterm{C} \term{T} \nonterm{A}  $|$ \nonterm{C} \term{F} \nonterm{B}}
-(2) for any given \<while C: B> loop, with a boolean conditional \<C>,
-it can be translated to an equivalent grammar rule
-%\begin{grammar}
-\mbox{\nonterm{L} \expandsto \nonterm{C} \nonterm{B} \nonterm{L} $|$ \nonterm{C}}
-%\end{grammar}
-(3) procedure definitions such as \<def P(): B \ldots> translate to a nonterminal symbol with the same
-name: \mbox{\nonterm{P} \expandsto \nonterm{B}}, and sequence of statements are simply captured
-directly with corresponding tokens.
-The details are given in \Cref{fig:cfg}.
-
-Given that \emph{any structured program} can thus be translated into a
-context-free grammar, the space of possible context-free grammars are also
-the space of control-flows of possible programs. Hence, to evaluate how
-an estimator performs on the reachability of all possible programs, it is
-sufficient to generate a statistically significant number of complex
-context-free programs that represent control-flows, and translate them back
-to programs. This raises a question. How can we translate these control-flows
-to equivalent programs with the same control flow.
-
-Fortunately, there's a simple answer. Given any non-left-recursive context-free
-grammar, we can generate a recursive-descent parser using these rules:
-(1) Each nonterminal \nonterm{E} becomes a function \<def parse\_E>.
-(2) Each production rule is implemented in that function.
-(3) Lookahead tokens guide which rule to apply.
-(4) Linear recursion can be replaced with a \<while> loop.
-
-Following in this fashion, we get a parser that directly corresponds to the context-free
-grammar. For example, given the grammar 
-\nonterm{E}\expandsto \nonterm{D} \nonterm{Es};
-\nonterm{Es}\expandsto \term{+}\nonterm{D}\nonterm{Es}$|$ $\epsilon$, we can translate
-this to:
-\begin{lstlisting}[style=Python, escapechar=|,numbersep=2pt]
-def parse_E():
-  parse_D()
-
-  while lookahead() == '+':
-    consume('+')
-    parse_D()
-  return node
-
-def parse_D():
-  token = lookahead()
-  if token and isdigit(token):
-    consume(token)
-  else:
-    raise Error()
-\end{lstlisting}
-which has similar control-flow as a program from which such a grammar may have
-been obtained.
-
-\noindent\textbf{Controlling the complexity.} 
+\noindent\textbf{Controlling the program complexity.}
 While generating context-free grammars, we have several mechanisms to
 precisely control the complexity. These include:
+
 \begin{itemize}
-\item The number of nonterminal symbols in the grammar. A grammar with a large number of nonterminal symbols will generate correspondingly larger number of parse procedures.
-\item The number of production rules, and the average length of individual rules. A large number of rules per definition produces correspondingly complex conditional statements that determine which parse procedure to choose. A larger length of individual rules can correspondingly increase the size of individual parsing procedures.
+    \item The number of nonterminals (corresponding to the number of procedures),
+    \item The number and length of production rules (corresponding to branching complexity),
+    \item The depth and type of recursion (direct, indirect, or linear recursion),
+    \item The inclusion of unreachable nonterminals or dead code to simulate partially unreachable programs.
 % \item The number and kind of alphabets in the language. A larger set of alphabets 
-\item The amount of direct, indirect, and linear recursion. One can further increase the complexity of parsing logic by increasing the kind and amount of recursion possible. For example, increasing the amount of linear recursion will increase the number of loops.
 % \item The VC dimension of the language.
 \end{itemize}
 
-These parameters allow us to generate large scale parser programs at will with
+These parameters allow us to generate large structured parser programs with
 complex control-flows. We can additionally increase the difficulty level by
 adding extra constraints to the generated parser such
 as context-sensitivity.
 
-\noindent\textbf{Constructing unreachable program elements.} When using synthetic
-benchmarks to evaluate maximum reachability, it can be important to ensure that the
-program contains some percentage of unreachable elements (otherwise, any estimator
-that answers 100\% irrespective of the program \emph{wins}). To incorporate such
-unreachable, we simply include nonterminal symbols that are not reachable from the
-start symbol. For more advanced analyzers, wrapping parser procedure call-sites is
-also an option.
-
-
-\noindent\textbf{Scalability and Applicability:} This methodology is designed to generate large-scale C parsers that consist of thousands of lines of code and complex control-flow.
+To prevent trivial estimation (e.g., estimators that always return 100\%),
+we introduce unreachable elements by including nonterminals that are not
+reachable from the start symbol.
+We may also wrap parser call-sites with guards or inject dead branches.
 
 \subsection{Assessing Reliability of \texorpdfstring{$\hat{S}$}{S-hat} Estimators Without Ground truth}
 To overcome any limitation that may exist due to the synthetic nature of our
