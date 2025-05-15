@@ -609,9 +609,12 @@ grammar, we can generate a recursive-descent parser using these rules:
 
 Following in this fashion, we get a parser that directly corresponds to the context-free
 grammar. For example, given the grammar
-\nonterm{E}\expandsto \nonterm{D} \nonterm{Es};
-\nonterm{Es}\expandsto \term{+}\nonterm{D}\nonterm{Es}$|$ $\epsilon$, we can translate
-this to:
+\begin{grammar}\centering
+  <E> $\rightarrow$ <D> <Es>\phantom{a}\phantom{a}\phantom{a}\phantom{a}\phantom{a}\phantom{a}\phantom{a}\phantom{a}
+
+<Es> $\rightarrow$ \term{+} <D> <Es> $\mid$ $\epsilon$
+\end{grammar}
+we can translate this to:
 \begin{lstlisting}[style=Python, escapechar=|,numbersep=2pt]
 def parse_E():
   parse_D()
