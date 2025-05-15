@@ -257,19 +257,12 @@ each test input belongs to one or more program execution behaviors,
 for example, reaching a program element, which can then be leveraged to
 estimate the total possible number of such behaviors such as the total
 possible reachable elements in a program~\cite{boehme2018stads}.
-% (e.g., a branch, path, function, or bug).
-
-% Under this analogy, statistical estimators such as Chao2 \cite{chao2017thirty} have been explored to approximate total reachable coverage from partially observed data.
 
 However, evaluating the accuracy and reliability
-%(in other words bias and variability)
 of these estimators is difficult. The main issue is that, to evaluate such
 estimators, we need a benchmark of several large complex programs where
 maximum reachability is known. Unfortunately, establishing the maximum
 reachability is impossible except for trivial programs. Hence, researchers have resorted to using small programs, fuzzed to saturation as an alternative~\cite{liyanage2023reachable}.
-% Using this approach, they have further shown that the reliability of such
-% estimators increase when the number of singletons (those elements that
-% are reached by a single)
 This approach is not ideal as performance of an estimator in small
 programs may not be representative of the performance of an estimator in complex
 real-world programs.
@@ -287,9 +280,6 @@ context-free grammars. Furthermore, one can also fine-tune the complexity
 of such grammars generated based on several dimensions such as the size
 of the grammar, the number of direct and indirect recursions allowed, the
 number of linear-recursive rules etc.
-% , the general size of the language
-% corresponding to the universe of all strings, and finally the VC-dimension
-% of the language.
 Finally, converting a context-free grammar to recursive descent
 parsers is well known, and produces parsers which have similarly complex
 control-flows.
