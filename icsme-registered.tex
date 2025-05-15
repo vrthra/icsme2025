@@ -874,7 +874,15 @@ Efforts to approximate reachability quantitatively have gained traction in the s
 
 To assess reachability or unreachability in dynamic analysis, both constraint-solving techniques such as SMT\footnote{SMT—Satisfiability Modulo Theory} and data-driven estimation methods have been explored. Naus et al.~\cite{naus2023low} proposed a technique for automatically generating preconditions to trigger specific post-conditions (e.g., bugs) using low-level code analysis. Similarly, Liew et al.~\cite{liew2019just} demonstrated how to encode SMT formulas within coverage-guided fuzzers to discover inputs that reach targeted program locations. In contrast, statistical approaches directly attempt to estimate the test effectiveness (aka maximum reachability) through observed behaviors. The pioneering STADS framework~\cite{boehme2018stads} introduced a suite of bio-statistical estimators by modeling fuzzing as a statistical sampling process. A recent evaluation of these estimators highlighted key challenges associated with reachability estimation~\cite{liyanage2023reachable}. When applied to estimate the number of killable mutants in mutation analysis, Kuznetsov et al.~\cite{Kuznetsov2024empirical} empirically demonstrated the unreliability of STADS estimators due to variations in sampling unit definitions. This finding, together with other recent studies, underscores the need for \emph{structure-aware} estimators that incorporate internal program structure, as opposed to structure-agnostic alternatives~\cite{lee2023statistical}.
 
-\todo{Talk about maze generation -- fuzzle}
+Using synthetic benchmarks by program generation has been attempted before.
+Fuzzle~\cite{lee2022fuzzle} is a benchmark for fuzzer evaluation that is built
+by encoding a sequence of moves in a maze as a chain of function calls. The
+limitation here is that mazes are rarely similar to real world programs.
+They are limited by the moves one can make in a maze. Furthermore, solving
+a maze typically requries finding a single path through a maze.
+Recursive descent parsers, on the other hand, are real-world programs, and
+are one of the major subjects in practical fuzzing.
+
 
 \section{Conclusion}
 \label{sec:conclusion}
