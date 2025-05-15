@@ -1,5 +1,6 @@
-icsme-registered.pdf: icsme-registered.tex icsme-registered.bib
-	latexmk -pdf icsme-registered.tex
+paper=icsme-registered
+$(paper).pdf: $(paper).tex $(paper).bib
+	latexmk -pdf $(paper).tex
 
 clean:
 	latexmk -C
@@ -11,6 +12,6 @@ pull:
 	git pull --rebase overleaf master --autostash
 
 v:
-	vim icsme-registered.tex
+	vim $(paper).tex
 b:
-	vim icsme-registered.bib
+	vim $(paper).bib
