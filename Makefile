@@ -1,4 +1,5 @@
 paper=icsme-registered
+pdfviewer?=evince
 $(paper).pdf: $(paper).tex $(paper).bib
 	latexmk -pdf $(paper).tex
 
@@ -15,3 +16,6 @@ v:
 	vim $(paper).tex
 b:
 	vim $(paper).bib
+p:
+	$(pdfviewer) $(paper).pdf
+
