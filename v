@@ -1,1 +1,0 @@
-vim icsme-registered.tex
