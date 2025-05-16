@@ -251,7 +251,7 @@ maximum reachability is known \cite{liyanage2021security}. Unfortunately, establ
 reachability is impossible except for trivial programs. Hence, researchers have resorted to using small programs, fuzzed to saturation as an alternative~\cite{liyanage2023reachable}.
 This approach is not ideal as the performance of an estimator in small  
 programs may not be representative of the performance of an estimator in complex
-real-world programs (such as the benchmarks in Fuzzbench \cite{metzman2021fuzzbench}).
+real-world programs.
 
 We propose an alternative approach to overcome this difficulty. We note that
 in programs such as parsers (which are one of the major subjects for fuzzing)
@@ -736,28 +736,34 @@ The following research question will investigate this question.
 \noindent\textbf{RQ2:} To what extent are the estimates of maximum reachability
 $S$ sensitive to changes in the sampling unit size $r$?
 
-\subsection{Fuzzers and Subject Programs}
+\subsection{Fuzzers, Subject Programs, and Initial Corpus}
 
-For our experiments, we use AFL++ \cite{fioraldi2020AFL++}, a widely recognized state-of-the-art greybox fuzzer known for its performance and extensive adoption in recent research, particularly in reachability estimation studies. Using the same fuzzer as prior work enables direct and fair comparisons when evaluating estimator performance (RQ2).
+\noindent\textbf{Fuzzer.} For our experiments, we employ AFL++~\cite{fioraldi2020AFL++}, a widely adopted state-of-the-art greybox fuzzer known for its effectiveness and prevalent use in recent reachability estimation studies. Unlike its predecessor AFL~\cite{zalewski2017american}, which selects seeds from a circular queue, AFL++ implements a probabilistic seed selection mechanism that aligns with the probabilistic model in STADS described in Section~\ref{sec:preliminaries}. 
+\vspace{1mm}
 
-As detailed in Section~\ref{sec:method}, we select a diverse set of large C parsers with known ground truth as our fuzzing benchmarks. We ensure that these targets are compatible with AFL++ and suitable for large-scale fuzzing experiments. \todo{Indicate the specific number of subjects/parsers etc.}
+\noindent\textbf{Programs.} As detailed in Section~\ref{sec:method}, we select a diverse set of large C parsers with known ground truth as our fuzzing benchmarks. We ensure that these targets are compatible with AFL++ and suitable for large-scale fuzzing experiments. \todo{Indicate the specific number of subjects/parsers etc.}
+
+For each target, we conduct multiple independent fuzzing trials $K$ to ensure consistency and reduce the impact of random variation.
+
+\noindent\textbf{Initial seed corpus.} As the introduced benchmark programs lack well-established seed corpora, we use a well-formed valid inputs as the initial seed corpus for each subject over multiple fuzzing trials.
 
 \subsection{Evaluation Metrics}
 To assess the performance of statistical estimators of maximum reachability, we adopt
 the following metrics, covering both accuracy and reliability.
+
 \begin{enumerate}
-\item \textbf{Point estimate bias.} We define the bias as the difference between the estimator's
-point estimate $\hat{S}$ and the known ground truth $S$ available from the synthetic benchmark.
+\item \textbf{Mean bias.} We define the bias at arbitrary sampling point $t$ as the difference between the estimator's
+point estimate $\hat{S}$ and the known ground truth $S$ available from the synthetic benchmark. We compute the average of relative bias over $K$ trials to account for random error.
 Formally,
 \begin{equation}
-\text{Bias} = \hat{S} - S
+%\text{Bias} = \hat{S}(t) - S
+\text{\emph{mean bias}}(t) = \sum_{i=1}^K \frac{\hat{S}_i(t)-S}{KS}
 \end{equation}
-A smaller absolute bias indicates better estimate accuracy. We will report the mean bias over
-multiple runs.
-\item \textbf{Confidence interval coverage.} When estimators provide confidence intervals, we will evaluate their coverage by checking whether the true $S$ lies within the specified interval. We will report the proportion of CIs containing the true $S$.
+A smaller absolute bias indicates better estimate accuracy. %We will report the mean bias over multiple runs.
 \item \textbf{Variance across multiple runs.} Variance quantifies the stability of the
-estimator across multiple fuzzing campaigns. For each estimator, we will report the variance
-of $\hat{S}$ over repeated trials. Low variance indicates greater stability and robustness of the estimation.
+estimator across multiple fuzzing campaigns. For each estimator, we will report the \emph{variance} or \emph{imprecision}\footnote{Imprecision~\cite{liyanage2023reachable} is defined as the variance of individual bias values.}
+of $\hat{S}$ over repeated $K$ trials. Low variance/imprecision indicates greater stability and robustness of the estimation.
+\item \textbf{Confidence interval coverage.} When estimators provide confidence intervals, we will evaluate their coverage by checking whether the true $S$ lies within the specified interval. We will report the proportion of CIs containing the true $S$.
 \item\textbf{Sampling unit sensitivity.} We will consider an estimator reliable if its
 point estimates across different time intervals have overlapping confidence intervals, and
 no significant shifts in mean estimates. We will use Welch's t-test to test whether the 
@@ -801,7 +807,7 @@ As with any empirical study, our findings on reachable coverage estimation in fu
 
 \emph{\textbf{Internal validity}} concerns the extent to which systematic errors are minimized. A key threat in our study is the establishment of a reliable ground truth for reachability, which is critical for the valid evaluation of estimator performance. Due to the limitations of existing methods for approximating ground truth in fuzzing, we use parsers derived from context-free grammars as benchmarks. These synthetic benchmarks provide exact ground truth reachability, enabling precise evaluation of estimation accuracy in terms of bias and variance. To further mitigate systematic bias from incorrect ground truth, we assess estimator reliability under varying sampling unit definitions within the same fuzzing campaign, without exposing the ground truth during estimation.
 
-\emph{\textbf{External validity}} refers to the extent to which our findings generalize across fuzzers, seed corpora, and subject programs. The use of synthetic parser benchmarks does not compromise complexity, as such non-trivial parsers are widely accepted in fuzzing \cite{lee2022fuzzle} and reflect structural characteristics of real-world programs. We evaluate all estimators using AFL++~\cite{fioraldi2020AFL++}, which aligns with the underlying probabilistic model and represents a widely adopted, state-of-the-art fuzzer derived from the original AFL \cite{zalewski2017american}. Due to the nature of our subjects (i.e. parsers)—we lack well-established seed corpora. Instead, we use a well-formed single input as the initial seed for each subject and perform multiple fuzzing trials, reporting average performance to ensure robustness and generalization of our findings.
+\emph{\textbf{External validity}} refers to the extent to which our findings generalize across fuzzers, seed corpora, and subject programs. The use of synthetic parser benchmarks does not compromise complexity, as such non-trivial parsers are widely accepted in fuzzing \cite{lee2022fuzzle} and reflect structural characteristics of real-world programs. We evaluate all estimators using AFL++~\cite{fioraldi2020AFL++}, which aligns with the underlying probabilistic model and represents a widely adopted, state-of-the-art fuzzer derived from the original AFL \cite{zalewski2017american}. Due to the nature of our subjects (i.e. parsers)—we lack well-established seed corpora. Instead, we use a well-formed valid set of inputs as the initial seed corpus for each subject and perform multiple fuzzing trials, reporting average performance to ensure robustness and generalization of our findings.
 
 \emph{\textbf{Construct validity:}} Given our research objectives, in evaluating reachability estimator performance, it is critical that the chosen evaluation metrics reflect both accuracy and reliability. To ensure measurement validity, we adopt (1) mean bias and variance to assess estimator accuracy, and (2) sensitivity to varying sampling units to assess estimator reliability. These metrics are well-established in prior fuzzing and related statistical estimation research, thereby supporting the appropriateness and validity of our constructs.
 
