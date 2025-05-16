@@ -738,10 +738,22 @@ $S$ sensitive to changes in the sampling unit size $r$?
 
 \subsection{Fuzzers, Subject Programs, and Initial Corpus}
 
-\noindent\textbf{Fuzzer.} For our experiments, we employ AFL++~\cite{fioraldi2020AFL++}, a widely adopted state-of-the-art greybox fuzzer known for its effectiveness and prevalent use in recent reachability estimation studies. Unlike its predecessor AFL~\cite{zalewski2017american}, which selects seeds from a circular queue, AFL++ implements a probabilistic seed selection mechanism that aligns with the probabilistic model in STADS described in Section~\ref{sec:preliminaries}. 
-\vspace{1mm}
+\noindent\textbf{Fuzzer.} For our experiments,
+we employ AFL++~\cite{fioraldi2020AFL++}, a widely adopted
+state-of-the-art greybox fuzzer known for its effectiveness and prevalent use in
+recent reachability estimation studies.
+Unlike its predecessor AFL~\cite{zalewski2017american}, which selects seeds from a circular queue, AFL++ implements a probabilistic seed selection mechanism that aligns with the probabilistic model in STADS described in Section~\ref{sec:preliminaries}.
 
-\noindent\textbf{Programs.} As detailed in Section~\ref{sec:method}, we select a diverse set of large C parsers with known ground truth as our fuzzing benchmarks. We ensure that these targets are compatible with AFL++ and suitable for large-scale fuzzing experiments. \todo{Indicate the specific number of subjects/parsers etc.}
+\noindent\textbf{Programs.} As detailed in Section~\ref{sec:method}, we will generate a
+diverse set of large C parsers with known reachability as our
+fuzzing benchmarks. For this research, we will generate 100
+parsers, with an average 100,000 lines of code in each.
+This is similar to the size of subjects in
+Fuzzbench~\cite{metzman2021fuzzbench}.
+We will ensure that the parsers have complex control-flows with
+loops, conditionals, direct, indirect, and linear recursion.
+We will also ensure that these targets are compatible with AFL++ and suitable for
+large-scale fuzzing experiments.
 
 For each target, we conduct multiple independent fuzzing trials $K$ to ensure consistency and reduce the impact of random variation.
 
